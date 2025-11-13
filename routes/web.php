@@ -23,5 +23,23 @@ Route::get('/assignments', function () {
     return view('assignments');
 })->middleware('auth')->name('assignments');
 
+Route::get('/summary', function () {
+    return view('summary');
+})->name('summary');
+
+Route::get('/chart-summary', function () {
+    return view('chart-summary');
+})->name('chart-summary');
+
+Route::get('/course-structure', function () {
+    return view('course-structure');
+})->name('course-structure');
+
+Route::get('/evaluation', function () {
+    return view('evaluation');
+})->name('evaluation');
+
+
+
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');

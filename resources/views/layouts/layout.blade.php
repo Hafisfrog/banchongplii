@@ -33,10 +33,11 @@
   </a>
 
   <a href="/summary"
-    class="block py-2.5 px-4 rounded-xl transition 
-    {{ request()->is('summary') ? 'bg-gray-700 font-medium' : 'hover:bg-gray-700' }}">
-    สรุปผลสัมฤทธิ์
-  </a>
+  class="block py-2.5 px-4 rounded-xl transition 
+  {{ request()->is('summary') ? 'bg-gray-700 font-medium' : 'hover:bg-gray-700' }}">
+  สรุปผลสัมฤทธิ์
+</a>
+
 
   <a href="/assignments"
     class="block py-2.5 px-4 rounded-xl transition 
@@ -44,17 +45,19 @@
     กำหนดชิ้นงาน
   </a>
 
-  <a href="/chart"
-    class="block py-2.5 px-4 rounded-xl transition 
-    {{ request()->is('chart') ? 'bg-gray-700 font-medium' : 'hover:bg-gray-700' }}">
-    แผนภูมิสรุป
-  </a>
+  <a href="/chart-summary"
+  class="block py-2.5 px-4 rounded-xl transition 
+  {{ request()->is('chart-summary') ? 'bg-gray-700 font-medium' : 'hover:bg-gray-700' }}">
+  แผนภูมิสรุป
+</a>
 
-  <a href="/course-structure"
-    class="block py-2.5 px-4 rounded-xl transition 
-    {{ request()->is('course-structure') ? 'bg-gray-700 font-medium' : 'hover:bg-gray-700' }}">
-    โครงสร้างรายวิชา
-  </a>
+
+ <a href="/course-structure"
+  class="block py-2.5 px-4 rounded-xl transition 
+  {{ request()->is('course-structure') ? 'bg-gray-700 font-medium' : 'hover:bg-gray-700' }}">
+  โครงสร้างรายวิชา
+</a>
+
 </nav>
 
     </div>
