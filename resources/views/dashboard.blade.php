@@ -3,192 +3,179 @@
 @section('title', 'ข้อมูลนักเรียน')
 
 @section('content')
-<div class="space-y-8 overflow-y-auto pr-2">
-  <div class="bg-white rounded-3xl shadow-md p-8 border border-gray-100 mb-2">
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-      <div>
-        <p class="text-sm text-slate-500 uppercase tracking-wide">แดชบอร์ด</p>
-        <h2 class="text-3xl font-bold text-gray-900 mt-1">ข้อมูลนักเรียน</h2>
-        <p class="text-gray-600 mt-1">
-          ยินดีต้อนรับ <span class="font-semibold text-blue-700">{{ Auth::user()->name }}</span>
-        </p>
-      </div>
-      <div class="ml-auto">
-        <button id="openModalBtn"
-          class="bg-blue-700 hover:bg-blue-800 text-white px-5 py-2.5 rounded-lg shadow transition inline-flex items-center justify-center gap-2">
-          <span class="text-lg leading-none">+</span>
-          <span>เพิ่มนักเรียน</span>
-        </button>
-      </div>
 
-    </div>
-  </div>
+@php
+    // ห้องเรียนของครู (MOCK)
+    $teacherRoom = 'ป1/1';
 
-  @if (session('status'))
-  <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-2xl text-sm">
-    {{ session('status') }}
-  </div>
-  @endif
+    // mock data
+    $rooms = ['ป1/1', 'ป1/2', 'ป1/3'];
+    $firstNames = ['กิตติ','อนันต์','ศิริชัย','นภัสกร','สุรเดช','ธีรภัทร','ชญาน์ทิพย์','กมลชนก','ธนพร'];
+    $lastNames = ['บุญมี','ใจดี','แก้วดี','ทองดี','เพ็งดี','พรมมา','แก้วดวงดี','หมื่นไทย'];
+    $genders = ['ชาย','หญิง'];
 
-  @if ($errors->any())
-  <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-2xl text-sm">
-    <p class="font-semibold">กรุณาตรวจสอบข้อมูลอีกครั้ง</p>
-    <ul class="list-disc pl-5 mt-2 space-y-1">
-      @foreach ($errors->all() as $error)
-      <li>{{ $error }}</li>
-      @endforeach
-    </ul>
-  </div>
-  @endif
+    // สร้าง MOCK เฉพาะห้อง ป.1/1
+    $mockStudents = [];
 
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-    <div class="p-6 bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-2xl text-center shadow-sm">
-      <h3 class="text-sm text-gray-600 mb-1">จำนวนนักเรียนทั้งหมด</h3>
-      <p class="text-4xl font-bold text-blue-700">{{ number_format($studentCount) }}</p>
-    </div>
-  </div>
-  
+    for ($i = 1; $i <= 60; $i++) {
+        $room = $rooms[array_rand($rooms)];
 
-  <div class="bg-white rounded-3xl shadow-md p-8 border border-gray-100">
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-      <div>
-        <h2 class="text-xl font-semibold text-gray-800">รายชื่อนักเรียน</h2>
-        <p class="text-sm text-gray-500 mt-1">รายงานรายชื่อล่าสุดเรียงจากผู้ที่เพิ่มล่าสุดก่อน</p>
-      </div>
-      <span class="text-sm text-gray-500">ทั้งหมด {{ number_format($studentCount) }} คน</span>
-    </div>
+        if ($room !== $teacherRoom) continue;
 
-    
-
-    <div class="overflow-x-auto">
-      <table class="min-w-full border border-gray-200 rounded-xl overflow-hidden text-sm text-gray-700">
-        <thead class="bg-blue-600 text-white">
-          <tr>
-            <th class="py-3 px-4 text-left font-medium">#</th>
-            <th class="py-3 px-4 text-left font-medium">รหัสประจำตัว</th>
-            <th class="py-3 px-4 text-left font-medium">คำนำหน้า</th>
-            <th class="py-3 px-4 text-left font-medium">ชื่อ</th>
-            <th class="py-3 px-4 text-left font-medium">นามสกุล</th>
-            <th class="py-3 px-4 text-center font-medium">จัดการ</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-100">
-          @forelse ($students as $index => $student)
-          <tr class="hover:bg-blue-50 transition">
-            <td class="py-2 px-4">{{ $index + 1 }}</td>
-            <td class="py-2 px-4 font-medium">{{ $student->student_code }}</td>
-            <td class="py-2 px-4">{{ $student->title }}</td>
-            <td class="py-2 px-4">{{ $student->first_name }}</td>
-            <td class="py-2 px-4">{{ $student->last_name }}</td>
-            <td class="py-2 px-4 text-center text-gray-400 text-xs">
-              เร็วๆ นี้
-            </td>
-          </tr>
-          @empty
-          <tr>
-            <td colspan="6" class="py-6 px-4 text-center text-gray-500">
-              ยังไม่มีข้อมูลนักเรียน กรุณาเพิ่มรายการใหม่
-            </td>
-          </tr>
-          @endforelse
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- Modal -->
-<div id="studentModal"
-  class="hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
-  <div class="absolute inset-0" id="modalOverlay"></div>
-
-  <div class="relative bg-white rounded-3xl shadow-2xl w-[90%] max-w-md p-6">
-    <button id="closeModalBtn" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-2xl leading-none">
-      &times;
-    </button>
-    <h3 class="text-lg font-semibold text-gray-800 mb-4">เพิ่มข้อมูลนักเรียน</h3>
-
-    {{-- action="{{ route('students.store') }}" --}}
-    <form method="POST" a class="space-y-4">
-      @csrf
-
-      <div>
-        <label for="student_code" class="block text-sm font-medium text-gray-700 mb-1">รหัสประจำตัวนักเรียน</label>
-        <input type="text" name="student_code" id="student_code" value="{{ old('student_code') }}"
-          class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 focus:outline-none"
-          placeholder="เช่น 2997 หรือ 3006">
-        @error('student_code')
-        <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
-        @enderror
-      </div>
-
-      <div>
-        <label for="title" class="block text-sm font-medium text-gray-700 mb-1">คำนำหน้า</label>
-        <select name="title" id="title"
-          class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 focus:outline-none">
-          <option value="">-- เลือกคำนำหน้า --</option>
-          @foreach (['เด็กชาย', 'เด็กหญิง', 'นาย', 'นางสาว'] as $title)
-          <option value="{{ $title }}" @selected(old('title') === $title)>
-            {{ $title }}
-          </option>
-          @endforeach
-        </select>
-        @error('title')
-        <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
-        @enderror
-      </div>
-
-      <div>
-        <label for="first_name" class="block text-sm font-medium text-gray-700 mb-1">ชื่อ</label>
-        <input type="text" name="first_name" id="first_name" value="{{ old('first_name') }}"
-          class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 focus:outline-none"
-          placeholder="ชื่อนักเรียน">
-        @error('first_name')
-        <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
-        @enderror
-      </div>
-
-      <div>
-        <label for="last_name" class="block text-sm font-medium text-gray-700 mb-1">นามสกุล</label>
-        <input type="text" name="last_name" id="last_name" value="{{ old('last_name') }}"
-          class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 focus:outline-none"
-          placeholder="นามสกุลนักเรียน">
-        @error('last_name')
-        <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
-        @enderror
-      </div>
-
-      <div class="flex justify-end space-x-2 pt-2">
-        <button type="button" id="cancelModal"
-          class="px-4 py-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition">ยกเลิก</button>
-        <button type="submit"
-          class="px-4 py-2 bg-blue-700 hover:bg-blue-800 text-white rounded-lg transition">บันทึก</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const modalWrapper = document.getElementById('studentModal');
-    const modalOverlay = document.getElementById('modalOverlay');
-    const openModal = document.getElementById('openModalBtn');
-    const closeModal = document.getElementById('closeModalBtn');
-    const cancelModal = document.getElementById('cancelModal');
-
-    const toggleModal = (shouldOpen) => {
-      modalWrapper.classList.toggle('hidden', !shouldOpen);
-      document.body.classList.toggle('overflow-hidden', shouldOpen);
-    };
-
-    openModal?.addEventListener('click', () => toggleModal(true));
-    closeModal?.addEventListener('click', () => toggleModal(false));
-    cancelModal?.addEventListener('click', () => toggleModal(false));
-    modalOverlay?.addEventListener('click', () => toggleModal(false));
-
-    if (@json($errors->any())) {
-      toggleModal(true);
+        $mockStudents[] = [
+            'code' => 11000 + $i,
+            'fname' => $firstNames[array_rand($firstNames)],
+            'lname' => $lastNames[array_rand($lastNames)],
+            'gender' => $genders[array_rand($genders)],
+            'room' => $room
+        ];
     }
-  });
-</script>
+
+    // ============= 🔍 SEARCH FILTER =============
+    if (request('search')) {
+        $keyword = strtolower(request('search'));
+        $mockStudents = array_filter($mockStudents, function($stu) use ($keyword) {
+            return strpos(strtolower($stu['code']), $keyword) !== false ||
+                   strpos(strtolower($stu['fname']), $keyword) !== false ||
+                   strpos(strtolower($stu['lname']), $keyword) !== false;
+        });
+        $mockStudents = array_values($mockStudents);
+    }
+
+    // ============= 🚹 FILTER เพศ =============
+    if (request('gender') && request('gender') !== 'all') {
+        $mockStudents = array_filter($mockStudents, function($stu) {
+            return $stu['gender'] === request('gender');
+        });
+        $mockStudents = array_values($mockStudents);
+    }
+
+    // ============= 🔽 SORT ระบบ =============
+    if (request('sort') === 'code_asc') {
+        usort($mockStudents, fn($a,$b) => $a['code'] <=> $b['code']);
+    }
+    if (request('sort') === 'code_desc') {
+        usort($mockStudents, fn($a,$b) => $b['code'] <=> $a['code']);
+    }
+    if (request('sort') === 'name_asc') {
+        usort($mockStudents, fn($a,$b) => strcmp($a['fname'], $b['fname']));
+    }
+    if (request('sort') === 'name_desc') {
+        usort($mockStudents, fn($a,$b) => strcmp($b['fname'], $a['fname']));
+    }
+
+    // ============= 🔢 PAGINATION =============
+    $perPage = 10;
+    $currentPage = request()->get('page', 1);
+    $offset = ($currentPage - 1) * $perPage;
+
+    $totalStudents = count($mockStudents);
+    $pageStudents = array_slice($mockStudents, $offset, $perPage);
+
+    $totalPages = ceil($totalStudents / $perPage);
+@endphp
+
+<div class="space-y-8 overflow-y-auto pr-2">
+
+  <!-- HEADER -->
+  <div class="bg-white rounded-3xl shadow-md p-8 border border-gray-100 mb-2">
+      <h2 class="text-3xl font-bold text-gray-900">ข้อมูลนักเรียนห้อง {{ $teacherRoom }}</h2>
+      <p class="text-gray-600 mt-1">ยินดีต้อนรับ <span class="font-semibold text-blue-700">{{ Auth::user()->name }}</span></p>
+  </div>
+
+  <!-- STATS -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="p-6 bg-blue-50 border border-blue-200 rounded-2xl text-center shadow-sm">
+          <h3 class="text-sm text-gray-600 mb-1">นักเรียนในห้อง</h3>
+          <p class="text-4xl font-bold text-blue-700">{{ $totalStudents }}</p>
+      </div>
+  </div>
+
+  <!-- SEARCH + FILTER + SORT -->
+  <div class="bg-white rounded-3xl shadow-md p-8 border border-gray-100">
+
+      <form method="GET" class="flex flex-wrap gap-3 mb-6">
+
+          <!-- Search -->
+          <input type="text" name="search"
+                 value="{{ request('search') }}"
+                 placeholder="ค้นหารหัส / ชื่อ..."
+                 class="input w-60">
+
+          <!-- Gender Filter -->
+          <select name="gender" class="input w-40">
+              <option value="all">เพศทั้งหมด</option>
+              <option value="ชาย" {{ request('gender')=='ชาย' ? 'selected':'' }}>ชาย</option>
+              <option value="หญิง" {{ request('gender')=='หญิง' ? 'selected':'' }}>หญิง</option>
+          </select>
+
+          <!-- Sort -->
+          <select name="sort" class="input w-40">
+              <option value="">-- เรียงตาม --</option>
+              <option value="code_asc" {{ request('sort')=='code_asc' ? 'selected':'' }}>รหัส ↑</option>
+              <option value="code_desc" {{ request('sort')=='code_desc' ? 'selected':'' }}>รหัส ↓</option>
+              <option value="name_asc" {{ request('sort')=='name_asc' ? 'selected':'' }}>ชื่อ ↑</option>
+              <option value="name_desc" {{ request('sort')=='name_desc' ? 'selected':'' }}>ชื่อ ↓</option>
+          </select>
+
+          <button class="bg-blue-600 text-white px-5 rounded-xl">ค้นหา</button>
+      </form>
+
+      <!-- TABLE -->
+      <div class="overflow-x-auto">
+          <table class="min-w-full border border-gray-200 rounded-xl text-sm text-gray-700">
+              <thead class="bg-blue-600 text-white">
+                  <tr>
+                      <th class="py-3 px-4">#</th>
+                      <th class="py-3 px-4">รหัส</th>
+                      <th class="py-3 px-4">ชื่อ - นามสกุล</th>
+                      <th class="py-3 px-4 text-center">เพศ</th>
+                      <th class="py-3 px-4 text-center">ห้อง</th>
+                      <th class="py-3 px-4 text-center">จัดการ</th>
+                  </tr>
+              </thead>
+
+              <tbody>
+                  @forelse ($pageStudents as $index => $stu)
+                  <tr class="border-b hover:bg-blue-50">
+                      <td class="py-3 px-4">{{ $offset + $index + 1 }}</td>
+                      <td class="py-3 px-4">{{ $stu['code'] }}</td>
+                      <td class="py-3 px-4">{{ $stu['fname'] }} {{ $stu['lname'] }}</td>
+                      <td class="py-3 px-4 text-center">{{ $stu['gender'] }}</td>
+                      <td class="py-3 px-4 text-center">{{ $stu['room'] }}</td>
+                      <td class="py-3 px-4 text-center text-xs">
+                          <button class="text-yellow-600">แก้ไข</button> |
+                          <button class="text-red-600">ลบ</button>
+                      </td>
+                  </tr>
+                  @empty
+                  <tr>
+                      <td colspan="6" class="text-center py-6 text-gray-500">ไม่มีข้อมูลนักเรียน</td>
+                  </tr>
+                  @endforelse
+              </tbody>
+          </table>
+      </div>
+
+      <!-- PAGINATION -->
+      <div class="flex justify-center mt-6 gap-2">
+          @if ($currentPage > 1)
+              <a href="?page={{ $currentPage-1 }}" class="px-3 py-1 border rounded">ก่อนหน้า</a>
+          @endif
+
+          @for ($p = 1; $p <= $totalPages; $p++)
+              <a href="?page={{ $p }}"
+                 class="px-3 py-1 border rounded {{ $p==$currentPage ? 'bg-blue-600 text-white' : '' }}">
+                 {{ $p }}
+              </a>
+          @endfor
+
+          @if ($currentPage < $totalPages)
+              <a href="?page={{ $currentPage+1 }}" class="px-3 py-1 border rounded">ถัดไป</a>
+          @endif
+      </div>
+
+  </div>
+</div>
+
 @endsection

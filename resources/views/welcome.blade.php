@@ -18,7 +18,7 @@
         </div>
 
         <!-- หัวข้อ -->
-        <h2 class="text-2xl font-bold text-gray-800 mb-1 text-center">ยินดีต้อนรับกลับ!</h2>
+        <h2 class="text-2xl font-bold text-gray-800 mb-1 text-center">ยินดีต้อนรับ</h2>
         <p class="text-gray-500 text-sm mb-6 text-center">กรุณาเข้าสู่ระบบเพื่อใช้งานระบบ</p>
 
         <!-- ฟอร์ม -->

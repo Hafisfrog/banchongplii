@@ -13,13 +13,13 @@
           ยินดีต้อนรับ <span class="font-semibold text-blue-700">{{ Auth::user()->name }}</span>
         </p>
       </div>
-      <div class="ml-auto">
+      {{-- <div class="ml-auto">
         <button id="openModalBtn"
           class="bg-blue-700 hover:bg-blue-800 text-white px-5 py-2.5 rounded-lg shadow transition inline-flex items-center justify-center gap-2">
           <span class="text-lg leading-none">+</span>
           <span>เพิ่มนักเรียน</span>
         </button>
-      </div>
+      </div> --}}
 
     </div>
   </div>

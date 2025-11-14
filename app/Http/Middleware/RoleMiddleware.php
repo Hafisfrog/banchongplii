@@ -4,24 +4,23 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class RoleMiddleware
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
-    public function handle($request, Closure $next, ...$roles)
-{
-    $user = auth()->user();
+    public function handle(Request $request, Closure $next, ...$roles)
+    {
+        $user = auth()->user();
 
-    if (!$user || !$user->hasRole($roles)) {
-        return response()->json(['message' => 'Permission denied'], 403);
+        // ถ้าไม่ได้ล็อกอิน → redirect ไป login
+        if (!$user) {
+            return redirect()->route('login');
+        }
+
+        // ถ้า role ไม่ตรง → 403 Forbidden
+        if (!$user->hasRole($roles)) {
+            abort(403, 'You do not have permission to access this page.');
+        }
+
+        return $next($request);
     }
-
-    return $next($request);
-}
-
 }

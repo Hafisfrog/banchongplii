@@ -51,38 +51,42 @@ class AuthController extends Controller
     // 🔹 Login
     // ===============================
     public function login(Request $request)
-    {
-        $request->validate([
-            'email'    => 'required|email',
-            'password' => 'required',
-        ]);
+{
+    $request->validate([
+        'email'    => 'required|email',
+        'password' => 'required',
+    ]);
 
-        if (!Auth::attempt($request->only('email', 'password'))) {
-            return back()->withErrors([
-                'email' => 'อีเมลหรือรหัสผ่านไม่ถูกต้อง',
-            ]);
-        }
+    $credentials = $request->only('email', 'password');
 
-        // ======================
-        // 🔥 ตรวจ role แล้ว redirect
-        // ======================
-        $role = Auth::user()->role;
-
-        if ($role === 'superadmin') {
-            return redirect()->route('dashboard.superadmin');
-        }
-
-        if ($role === 'teacher') {
-            return redirect()->route('dashboard.teacher');
-        }
-
-        if ($role === 'director') {
-            return redirect()->route('dashboard.director');
-        }
-
-        // fallback ถ้า role ไม่ถูกต้อง
-        return redirect()->route('dashboard');
+    if (!Auth::attempt($credentials)) {
+        return back()->withErrors([
+            'email' => 'อีเมลหรือรหัสผ่านไม่ถูกต้อง',
+        ])->withInput();
     }
+
+    // 🔥 เข้าสู่ระบบสำเร็จ -> เช็ค role แล้ว redirect
+    $role = Auth::user()->role;
+
+    if ($role === 'admin' || $role === 'superadmin') {
+        // ผู้ดูแล (รวม superadmin กับ admin ใช้ dashboard เดียวกัน)
+        return redirect()->route('dashboard.admin');
+    }
+
+    if ($role === 'teacher') {
+        return redirect()->route('dashboard.teacher');
+    }
+
+    if ($role === 'director') {
+        return redirect()->route('dashboard.director');
+    }
+
+    // ถ้า role แปลก ๆ ให้เด้งกลับหน้า login
+    Auth::logout();
+    return redirect()->route('login')->withErrors([
+        'email' => 'สิทธิ์ผู้ใช้ไม่ถูกต้อง',
+    ]);
+}
 
     // ===============================
     // 🔹 Logout

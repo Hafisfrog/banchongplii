@@ -1,13 +1,44 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StudentController;
 
-// ========================
-//   AUTH
-// ========================
 
+/*
+|--------------------------------------------------------------------------
+| HOME REDIRECT BY ROLE
+|--------------------------------------------------------------------------
+*/
+Route::get('/', function () {
+
+    if (!Auth::check()) {
+        return redirect()->route('login');
+    }
+
+    switch (Auth::user()->role) {
+
+        case 'superadmin':    // superadmin = admin ด้วย
+            return redirect()->route('dashboard.admin');
+
+        case 'teacher':
+            return redirect()->route('dashboard.teacher');
+
+        case 'director':
+            return redirect()->route('dashboard.director');
+
+        default:
+            return redirect()->route('login');
+    }
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| AUTH
+|--------------------------------------------------------------------------
+*/
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
 
@@ -16,52 +47,63 @@ Route::post('/register', [AuthController::class, 'register'])->name('register.su
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// ========================
-//   DASHBOARD BY ROLE
-// ========================
 
+/*
+|--------------------------------------------------------------------------
+| DASHBOARDS BY ROLE
+|--------------------------------------------------------------------------
+*/
 Route::middleware(['auth'])->group(function () {
 
-    // 🔹 Dashboard Superadmin
-    Route::get('/dashboard/superadmin', function () {
-        return view('dashboards.superadmin');
-    })->name('dashboard.superadmin');
+    // ✔ Superadmin (รวม admin เดิม)
+    Route::get('/dashboard/admin', function () {
+        return view('dashboards.admin');
+    })->name('dashboard.admin');
 
-    // 🔹 Dashboard Teacher (ใช้หน้าเดิมของพี่)
+    // ✔ Teacher
     Route::get('/dashboard/teacher', [StudentController::class, 'index'])
         ->name('dashboard.teacher');
 
-    // 🔹 Dashboard Director
+    // ✔ Director
     Route::get('/dashboard/director', function () {
         return view('dashboards.director');
     })->name('dashboard.director');
 });
 
-// ========================
-//   หน้าอื่นๆ เดิมของพี่
-// ========================
 
-Route::get('/attendance', function () {
-    return view('attendance');
-})->middleware('auth')->name('attendance');
+/*
+|--------------------------------------------------------------------------
+| SUPERADMIN PAGES (เพิ่มนักเรียน/เพิ่มครู/จัดการผู้ใช้)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth'])->group(function () {
 
-Route::get('/assignments', function () {
-    return view('assignments');
-})->middleware('auth')->name('assignments');
+    // เฉพาะ superadmin เท่านั้น
+    Route::middleware('role:superadmin')->group(function () {
 
-Route::get('/summary', function () {
-    return view('summary');
-})->middleware('auth')->name('summary');
+        Route::view('/admin/manage-users', 'admin.manage-users')
+            ->name('admin.manage-users');
 
-Route::get('/chart-summary', function () {
-    return view('chart-summary');
-})->middleware('auth')->name('chart-summary');
+        Route::view('/admin/add-student', 'admin.add-student')
+            ->name('admin.add-student');
 
-Route::get('/course-structure', function () {
-    return view('course-structure');
-})->middleware('auth')->name('course-structure');
+        Route::view('/admin/add-teacher', 'admin.add-teacher')
+            ->name('admin.add-teacher');
+    });
+});
 
-Route::get('/evaluation', function () {
-    return view('evaluation');
-})->middleware('auth')->name('evaluation');
 
+/*
+|--------------------------------------------------------------------------
+| OTHER PAGES (ของครู/ผู้บริหาร)
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->group(function () {
+
+    Route::view('/attendance', 'attendance')->name('attendance');
+    Route::view('/assignments', 'assignments')->name('assignments');
+    Route::view('/summary', 'summary')->name('summary');
+    Route::view('/chart-summary', 'chart-summary')->name('chart-summary');
+    Route::view('/course-structure', 'course-structure')->name('course-structure');
+    Route::view('/evaluation', 'evaluation')->name('evaluation');
+});
