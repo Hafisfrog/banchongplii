@@ -64,6 +64,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard/teacher', [StudentController::class, 'index'])
         ->name('dashboard.teacher');
 
+    Route::get('/teacher/course/create', function () {
+    return view('teacher.course-create');
+})->name('teacher.course-create');
+
+
     // ✔ Director
     Route::get('/dashboard/director', function () {
         return view('dashboards.director');

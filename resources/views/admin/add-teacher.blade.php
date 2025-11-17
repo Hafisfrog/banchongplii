@@ -21,10 +21,12 @@
         </button> --}}
     </div>
 
-    <input type="text" id="searchInput"
-           onkeyup="searchTeacher()"
-           placeholder="ค้นหาชื่อ / อีเมล / เบอร์โทร..."
-           class="input w-72">
+    <div class="bg-white border-2 border-blue-600 rounded-xl p-3">
+        <input type="text" id="searchInput"
+               onkeyup="searchTeacher()"
+               placeholder="ค้นหาชื่อ / อีเมล / เบอร์โทร..."
+               class="w-full border-0 outline-none">
+    </div>
 </div>
 
 <!-- Filter บทบาท -->
@@ -77,7 +79,7 @@
                 <td class="p-3 text-center">{{ $i }}</td>
                 <td class="p-3">{{ $fname.' '.$lname }}</td>
                 <td class="p-3">{{ $email }}</td>
-                <td class="p-3">{{ $phone }}</td>
+                <td class="p-3">{{ substr($phone, 0, 3) }}{{ str_repeat('x', 3) }}{{ substr($phone, -4) }}</td>
                 <td class="p-3 text-blue-600 font-semibold text-center">
                     {{ $role == 'teacher' ? 'ครู' : 'ผู้ช่วยครู' }}
                 </td>
@@ -218,6 +220,9 @@ function addTeacher() {
     let table = document.getElementById("teacherTable");
 
     let roleText = role === "teacher" ? "ครู" : "ผู้ช่วยครู";
+    
+    // Format phone number to 093xxxxxxx
+    let maskedPhone = phone.substring(0, 3) + "xxx" + phone.substring(6);
 
     let row = `
         <tr class="border-b teacher-row"
@@ -228,7 +233,7 @@ function addTeacher() {
             <td class="p-3 text-center">ใหม่</td>
             <td class="p-3">${fname} ${lname}</td>
             <td class="p-3">${email}</td>
-            <td class="p-3">${phone}</td>
+            <td class="p-3">${maskedPhone}</td>
             <td class="p-3 text-center text-blue-600 font-semibold">${roleText}</td>
             <td class="p-3 text-center">
                 <button onclick="alert('แก้ไข (mock)')" class="text-yellow-600 font-semibold">แก้ไข</button> |

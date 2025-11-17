@@ -1,181 +1,130 @@
 @extends('layouts.layout')
 
-@section('title', 'ข้อมูลนักเรียน')
+@section('title', 'แดชบอร์ดครู')
 
 @section('content')
-
-@php
-    // ห้องเรียนของครู (MOCK)
-    $teacherRoom = 'ป1/1';
-
-    // mock data
-    $rooms = ['ป1/1', 'ป1/2', 'ป1/3'];
-    $firstNames = ['กิตติ','อนันต์','ศิริชัย','นภัสกร','สุรเดช','ธีรภัทร','ชญาน์ทิพย์','กมลชนก','ธนพร'];
-    $lastNames = ['บุญมี','ใจดี','แก้วดี','ทองดี','เพ็งดี','พรมมา','แก้วดวงดี','หมื่นไทย'];
-    $genders = ['ชาย','หญิง'];
-
-    // สร้าง MOCK เฉพาะห้อง ป.1/1
-    $mockStudents = [];
-
-    for ($i = 1; $i <= 60; $i++) {
-        $room = $rooms[array_rand($rooms)];
-
-        if ($room !== $teacherRoom) continue;
-
-        $mockStudents[] = [
-            'code' => 11000 + $i,
-            'fname' => $firstNames[array_rand($firstNames)],
-            'lname' => $lastNames[array_rand($lastNames)],
-            'gender' => $genders[array_rand($genders)],
-            'room' => $room
-        ];
-    }
-
-    // ============= 🔍 SEARCH FILTER =============
-    if (request('search')) {
-        $keyword = strtolower(request('search'));
-        $mockStudents = array_filter($mockStudents, function($stu) use ($keyword) {
-            return strpos(strtolower($stu['code']), $keyword) !== false ||
-                   strpos(strtolower($stu['fname']), $keyword) !== false ||
-                   strpos(strtolower($stu['lname']), $keyword) !== false;
-        });
-        $mockStudents = array_values($mockStudents);
-    }
-
-    // ============= 🚹 FILTER เพศ =============
-    if (request('gender') && request('gender') !== 'all') {
-        $mockStudents = array_filter($mockStudents, function($stu) {
-            return $stu['gender'] === request('gender');
-        });
-        $mockStudents = array_values($mockStudents);
-    }
-
-    // ============= 🔽 SORT ระบบ =============
-    if (request('sort') === 'code_asc') {
-        usort($mockStudents, fn($a,$b) => $a['code'] <=> $b['code']);
-    }
-    if (request('sort') === 'code_desc') {
-        usort($mockStudents, fn($a,$b) => $b['code'] <=> $a['code']);
-    }
-    if (request('sort') === 'name_asc') {
-        usort($mockStudents, fn($a,$b) => strcmp($a['fname'], $b['fname']));
-    }
-    if (request('sort') === 'name_desc') {
-        usort($mockStudents, fn($a,$b) => strcmp($b['fname'], $a['fname']));
-    }
-
-    // ============= 🔢 PAGINATION =============
-    $perPage = 10;
-    $currentPage = request()->get('page', 1);
-    $offset = ($currentPage - 1) * $perPage;
-
-    $totalStudents = count($mockStudents);
-    $pageStudents = array_slice($mockStudents, $offset, $perPage);
-
-    $totalPages = ceil($totalStudents / $perPage);
-@endphp
-
 <div class="space-y-8 overflow-y-auto pr-2">
 
-  <!-- HEADER -->
-  <div class="bg-white rounded-3xl shadow-md p-8 border border-gray-100 mb-2">
-      <h2 class="text-3xl font-bold text-gray-900">ข้อมูลนักเรียนห้อง {{ $teacherRoom }}</h2>
-      <p class="text-gray-600 mt-1">ยินดีต้อนรับ <span class="font-semibold text-blue-700">{{ Auth::user()->name }}</span></p>
-  </div>
+    <!-- Header -->
+    <div class="bg-white rounded-3xl shadow-md p-8 border border-gray-100 mb-2">
+        <h2 class="text-3xl font-bold text-gray-900">แดชบอร์ดครู</h2>
+        <p class="text-gray-600 mt-1">
+            ยินดีต้อนรับ <span class="font-semibold text-blue-700">{{ Auth::user()->name }}</span>
+        </p>
+    </div>
 
-  <!-- STATS -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="p-6 bg-blue-50 border border-blue-200 rounded-2xl text-center shadow-sm">
-          <h3 class="text-sm text-gray-600 mb-1">นักเรียนในห้อง</h3>
-          <p class="text-4xl font-bold text-blue-700">{{ $totalStudents }}</p>
-      </div>
-  </div>
+    <!-- Stats -->
+    @php
+        $studentCount = 40;
+        $courseCount  = 4;
+        $attendanceToday = 38;
+    @endphp
 
-  <!-- SEARCH + FILTER + SORT -->
-  <div class="bg-white rounded-3xl shadow-md p-8 border border-gray-100">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-      <form method="GET" class="flex flex-wrap gap-3 mb-6">
+        <div class="p-6 bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-2xl text-center shadow-sm">
+            <h3 class="text-sm text-gray-600 mb-1">จำนวนนักเรียนในห้อง</h3>
+            <p class="text-4xl font-bold text-blue-700">{{ $studentCount }}</p>
+        </div>
 
-          <!-- Search -->
-          <input type="text" name="search"
-                 value="{{ request('search') }}"
-                 placeholder="ค้นหารหัส / ชื่อ..."
-                 class="input w-60">
+        <div class="p-6 bg-gradient-to-r from-green-50 to-green-100 border border-green-200 rounded-2xl text-center shadow-sm">
+            <h3 class="text-sm text-gray-600 mb-1">หลักสูตรที่สร้างแล้ว</h3>
+            <p class="text-4xl font-bold text-green-700">{{ $courseCount }}</p>
+        </div>
 
-          <!-- Gender Filter -->
-          <select name="gender" class="input w-40">
-              <option value="all">เพศทั้งหมด</option>
-              <option value="ชาย" {{ request('gender')=='ชาย' ? 'selected':'' }}>ชาย</option>
-              <option value="หญิง" {{ request('gender')=='หญิง' ? 'selected':'' }}>หญิง</option>
-          </select>
+        <div class="p-6 bg-gradient-to-r from-yellow-50 to-yellow-100 border border-yellow-200 rounded-2xl text-center shadow-sm">
+            <h3 class="text-sm text-gray-600 mb-1">มาเรียนวันนี้</h3>
+            <p class="text-4xl font-bold text-yellow-700">{{ $attendanceToday }}</p>
+        </div>
 
-          <!-- Sort -->
-          <select name="sort" class="input w-40">
-              <option value="">-- เรียงตาม --</option>
-              <option value="code_asc" {{ request('sort')=='code_asc' ? 'selected':'' }}>รหัส ↑</option>
-              <option value="code_desc" {{ request('sort')=='code_desc' ? 'selected':'' }}>รหัส ↓</option>
-              <option value="name_asc" {{ request('sort')=='name_asc' ? 'selected':'' }}>ชื่อ ↑</option>
-              <option value="name_desc" {{ request('sort')=='name_desc' ? 'selected':'' }}>ชื่อ ↓</option>
-          </select>
+    </div>
 
-          <button class="bg-blue-600 text-white px-5 rounded-xl">ค้นหา</button>
-      </form>
+    <!-- Course List -->
+    <div class="bg-white rounded-3xl shadow-md p-8 border border-gray-100">
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">หลักสูตรที่รับผิดชอบ</h3>
 
-      <!-- TABLE -->
-      <div class="overflow-x-auto">
-          <table class="min-w-full border border-gray-200 rounded-xl text-sm text-gray-700">
-              <thead class="bg-blue-600 text-white">
-                  <tr>
-                      <th class="py-3 px-4">#</th>
-                      <th class="py-3 px-4">รหัส</th>
-                      <th class="py-3 px-4">ชื่อ - นามสกุล</th>
-                      <th class="py-3 px-4 text-center">เพศ</th>
-                      <th class="py-3 px-4 text-center">ห้อง</th>
-                      <th class="py-3 px-4 text-center">จัดการ</th>
-                  </tr>
-              </thead>
+        @php
+            $courses = [
+                ['name' => 'คณิตศาสตร์พื้นฐาน ป.1', 'room'=>'ป1/1'],
+                ['name' => 'วิทยาศาสตร์ ป.1', 'room'=>'ป1/1'],
+                ['name' => 'ภาษาไทย ป.1', 'room'=>'ป1/1'],
+                ['name' => 'สังคมศึกษา ป.1', 'room'=>'ป1/1'],
+            ];
+        @endphp
 
-              <tbody>
-                  @forelse ($pageStudents as $index => $stu)
-                  <tr class="border-b hover:bg-blue-50">
-                      <td class="py-3 px-4">{{ $offset + $index + 1 }}</td>
-                      <td class="py-3 px-4">{{ $stu['code'] }}</td>
-                      <td class="py-3 px-4">{{ $stu['fname'] }} {{ $stu['lname'] }}</td>
-                      <td class="py-3 px-4 text-center">{{ $stu['gender'] }}</td>
-                      <td class="py-3 px-4 text-center">{{ $stu['room'] }}</td>
-                      <td class="py-3 px-4 text-center text-xs">
-                          <button class="text-yellow-600">แก้ไข</button> |
-                          <button class="text-red-600">ลบ</button>
-                      </td>
-                  </tr>
-                  @empty
-                  <tr>
-                      <td colspan="6" class="text-center py-6 text-gray-500">ไม่มีข้อมูลนักเรียน</td>
-                  </tr>
-                  @endforelse
-              </tbody>
-          </table>
-      </div>
+        <table class="min-w-full border border-gray-200 rounded-xl overflow-hidden text-sm">
+            <thead class="bg-blue-600 text-white">
+                <tr>
+                    <th class="py-3 px-4 text-left">ชื่อหลักสูตร</th>
+                    <th class="py-3 px-4 text-center">ห้อง</th>
+                    <th class="py-3 px-4 text-center">จัดการ</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                @foreach ($courses as $c)
+                <tr class="hover:bg-blue-50">
+                    <td class="py-2 px-4">{{ $c['name'] }}</td>
+                    <td class="py-2 px-4 text-center">{{ $c['room'] }}</td>
+                    <td class="py-2 px-4 text-center">
+                        <button class="text-yellow-600 hover:underline">แก้ไข</button> |
+                        <button class="text-red-600 hover:underline">ลบ</button>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
 
-      <!-- PAGINATION -->
-      <div class="flex justify-center mt-6 gap-2">
-          @if ($currentPage > 1)
-              <a href="?page={{ $currentPage-1 }}" class="px-3 py-1 border rounded">ก่อนหน้า</a>
-          @endif
+    <!-- Graph Section -->
+    <div class="bg-white rounded-3xl shadow-md p-8 border border-gray-100">
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">กราฟคะแนนเฉลี่ยรายวิชา</h3>
 
-          @for ($p = 1; $p <= $totalPages; $p++)
-              <a href="?page={{ $p }}"
-                 class="px-3 py-1 border rounded {{ $p==$currentPage ? 'bg-blue-600 text-white' : '' }}">
-                 {{ $p }}
-              </a>
-          @endfor
+        <canvas id="scoreChart" height="120"></canvas>
+    </div>
 
-          @if ($currentPage < $totalPages)
-              <a href="?page={{ $currentPage+1 }}" class="px-3 py-1 border rounded">ถัดไป</a>
-          @endif
-      </div>
+    <!-- Notifications -->
+    <div class="bg-white rounded-3xl shadow-md p-8 border border-gray-100 mb-20">
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">ประกาศจากโรงเรียน</h3>
 
-  </div>
+        <ul class="space-y-3 text-sm text-gray-700">
+            <li>📌 วันที่ 15 นี้ มีประชุมครูทั้งโรงเรียน</li>
+            <li>📌 นักเรียนต้องส่งงานวิทยาศาสตร์ภายในวันที่ 20</li>
+            <li>📌 เตรียมสรุปการประเมินผลสิ้นภาคเรียน</li>
+        </ul>
+    </div>
+
 </div>
+
+{{-- โหลด Chart.js --}}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const ctx = document.getElementById('scoreChart').getContext('2d');
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['คณิต', 'วิทย์', 'ภาษาไทย', 'สังคม'],
+            datasets: [{
+                label: 'คะแนนเฉลี่ย',
+                data: [78, 82, 75, 88],
+                backgroundColor: ['#60a5fa', '#34d399', '#fbbf24', '#a78bfa'],
+                borderRadius: 8,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
+        }
+    });
+</script>
 
 @endsection

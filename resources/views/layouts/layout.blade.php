@@ -16,7 +16,7 @@
 
   <!-- Main -->
   <main class="flex-1 flex flex-col p-10 bg-gray-50 overflow-hidden h-screen">
-    <div class="bg-white rounded-3xl shadow-md p-8 border border-gray-100 flex flex-col flex-1 overflow-hidden">
+    <div class="flex flex-col flex-1 overflow-hidden">
       @yield('content')
     </div>
   </main>

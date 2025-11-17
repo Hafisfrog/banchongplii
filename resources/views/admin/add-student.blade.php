@@ -23,16 +23,18 @@
         </button>
     </div>
 
-    <!-- Search -->
-    <input type="text" id="searchInput"
-           onkeyup="searchStudent()"
-           placeholder="ค้นหาชื่อ หรือ รหัสนักเรียน..."
-           class="input w-72">
+        <!-- Search -->
+        <div class="bg-white border-2 border-blue-600 rounded-xl p-3 shadow-sm">
+            <input type="text" id="searchInput"
+                         onkeyup="searchStudent()"
+                         placeholder="ค้นหาชื่อ หรือ รหัสนักเรียน..."
+                         class="input w-72 border-0 focus:ring-0">
+        </div>
 </div>
 
 <!-- Filter ห้อง -->
 <div class="mb-6">
-    <label class="font-semibold text-gray-700">เลือกห้องเรียน:</label>
+    <label class="font-semibold text-black">เลือกห้องเรียน:</label>
     <select id="roomFilter" onchange="filterRoom()" class="input w-48 ml-3">
         <option value="all">ทั้งหมด</option>
         <option value="ป1/1">ป.1/1</option>
@@ -110,7 +112,7 @@
         <button onclick="closeRoomSelector()"
             class="absolute top-3 right-3 text-gray-500 text-xl">&times;</button>
 
-        <h2 class="text-xl font-bold text-gray-800 mb-4">เลือกห้องเรียน</h2>
+        <h2 class="text-xl font-bold text-black mb-4">เลือกห้องเรียน</h2>
 
         <select id="selectedRoom" class="input w-full mb-6">
             <option value="">-- เลือกห้อง --</option>
@@ -120,7 +122,7 @@
         </select>
 
         <button onclick="goToAddStudent()"
-            class="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 rounded-xl">
+            class="bg-black hover:bg-gray-900 text-white w-full py-2 rounded-xl">
             ต่อไป ➜
         </button>
     </div>
@@ -138,12 +140,12 @@
         <button onclick="closeImportModal()"
             class="absolute top-3 right-3 text-gray-500 text-xl">&times;</button>
 
-        <h2 class="text-xl font-bold text-gray-800 mb-4">นำเข้ารายชื่อนักเรียน (Excel)</h2>
+        <h2 class="text-xl font-bold text-black mb-4">นำเข้ารายชื่อนักเรียน (Excel)</h2>
 
         <input type="file" class="input w-full mb-4">
 
         <button onclick="alert('Import Excel แบบ Mock')"
-            class="bg-green-600 hover:bg-green-700 w-full text-white py-2 rounded-xl">
+            class="bg-black hover:bg-gray-900 w-full text-white py-2 rounded-xl">
              อัปโหลดไฟล์
         </button>
     </div>
@@ -160,8 +162,8 @@
         <button onclick="closeAddStudentModal()"
             class="absolute top-3 right-3 text-gray-500 text-xl">&times;</button>
 
-        <h2 class="text-xl font-bold text-gray-800 mb-4">
-            เพิ่มนักเรียน (ห้อง: <span id="selectedRoomText" class="text-blue-700"></span>)
+        <h2 class="text-xl font-bold text-black mb-4">
+            เพิ่มนักเรียน (ห้อง: <span id="selectedRoomText" class="text-black"></span>)
         </h2>
 
         <div class="mb-4">
@@ -175,7 +177,7 @@
         </div>
 
         <button onclick="addStudent()"
-            class="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 rounded-xl">
+            class="bg-black hover:bg-gray-900 text-white w-full py-2 rounded-xl">
             ➕ เพิ่มนักเรียน
         </button>
     </div>
