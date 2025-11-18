@@ -32,72 +32,47 @@
             </div>
 
             <!-- ชั้นเรียน -->
-<div>
-    <label class="block text-sm font-medium text-gray-700 mb-1">ชั้นเรียน</label>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">ชั้นเรียน</label>
 
-    <select id="gradeSelect"
-            class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400">
-        <option value="">-- เลือกชั้นเรียน --</option>
-        @for ($g = 1; $g <= 6; $g++)
-            <option value="ป.{{ $g }}">ป.{{ $g }}</option>
-        @endfor
-    </select>
-</div>
+                <select id="gradeSelect"
+                        class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400">
+                    <option value="">-- เลือกชั้นเรียน --</option>
+                    @for ($g = 1; $g <= 6; $g++)
+                        <option value="ป.{{ $g }}">ป.{{ $g }}</option>
+                    @endfor
+                </select>
+            </div>
 
-<!-- เพิ่มห้องไม่จำกัด -->
-<div class="mt-3">
-    <label class="block text-sm font-medium text-gray-700 mb-1">
-        เพิ่มห้องเรียน (ไม่จำกัดจำนวน)
-    </label>
-
-    <div class="flex gap-3">
-
-        <!-- ช่องกรอกเลขห้อง -->
-        <input id="roomNumberInput"
-               type="number"
-               class="w-32 border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400"
-               placeholder="เช่น 1">
-
-        <!-- ปุ่มเพิ่ม -->
-        <button type="button"
-                onclick="addRoom()"
-                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl">
-            เพิ่มห้อง
-        </button>
-    </div>
-
-    <p class="text-xs text-gray-500 mt-1">
-        ระบบจะสร้างเป็น "ป.X/ห้อง" อัตโนมัติ เช่น ป.2/5
-    </p>
-
-    <!-- แสดงรายการห้องที่เลือก -->
-    <div id="selectedRooms" class="mt-3 space-y-2"></div>
-</div>
-
-
-            <!-- ห้องเรียนหลายห้อง -->
-            {{-- <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1 mt-3">
-                    ห้องเรียนที่สอนได้ (เลือกได้หลายห้อง)
+            <!-- เพิ่มห้องไม่จำกัด -->
+            <div class="mt-3">
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    เพิ่มห้องเรียน (ไม่จำกัดจำนวน)
                 </label>
 
                 <div class="flex gap-3">
-                    <select id="roomSelect"
-                            class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400"
-                            disabled>
-                        <option value="">-- เลือกชั้นเรียนก่อน --</option>
-                    </select>
 
+                    <!-- ช่องกรอกเลขห้อง -->
+                    <input id="roomNumberInput"
+                        type="number"
+                        class="w-32 border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400"
+                        placeholder="เช่น 1">
+
+                    <!-- ปุ่มเพิ่ม -->
                     <button type="button"
                             onclick="addRoom()"
                             class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl">
-                        เพิ่ม
+                        เพิ่มห้อง
                     </button>
                 </div>
 
-                
+                <p class="text-xs text-gray-500 mt-1">
+                    ระบบจะสร้างเป็น "ป.X/ห้อง" อัตโนมัติ เช่น ป.2/5
+                </p>
+
+                <!-- แสดงรายการห้องที่เลือก -->
                 <div id="selectedRooms" class="mt-3 space-y-2"></div>
-            </div> --}}
+            </div>
 
             <!-- ภาคเรียน + ปี -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -161,8 +136,16 @@
             <tbody class="divide-y divide-gray-100">
                 @foreach ($mockCourses as $c)
                 <tr class="hover:bg-blue-50 transition">
-                    <td class="py-2 px-4">{{ $c['name'] }}</td>
 
+                    <!-- ชื่อหลักสูตรคลิกได้ -->
+                    <td class="py-2 px-4">
+                        <a href="{{ route('course.detail', $loop->index) }}"
+                           class="text-blue-600 hover:underline font-medium">
+                            {{ $c['name'] }}
+                        </a>
+                    </td>
+
+                    <!-- ห้องเรียน -->
                     <td class="py-2 px-4 text-center">
                         @foreach ($c['rooms'] as $r)
                             <span class="inline-block bg-blue-100 text-blue-700 px-2 py-1 rounded-lg text-xs mr-1">
@@ -175,8 +158,18 @@
                     <td class="py-2 px-4 text-center">{{ $c['year'] }}</td>
 
                     <td class="py-2 px-4 text-center">
-                        <button class="text-yellow-600 hover:underline">แก้ไข</button> |
+
+                        <!-- ปุ่มดูรายละเอียด -->
+                        <a href="{{ route('course.detail', $loop->index) }}"
+                           class="text-blue-600 hover:underline font-medium">
+                            ดูรายละเอียด
+                        </a>
+                        |
+
+                        <button class="text-yellow-600 hover:underline">แก้ไข</button>
+                        |
                         <button class="text-red-600 hover:underline">ลบ</button>
+
                     </td>
                 </tr>
                 @endforeach
@@ -217,7 +210,7 @@ function addRoom() {
     }
 
     selectedRoomList.push(roomName);
-    document.getElementById("roomNumberInput").value = ""; // clear input
+    document.getElementById("roomNumberInput").value = "";
     renderSelectedRooms();
 }
 
@@ -236,8 +229,7 @@ function renderSelectedRooms() {
         container.innerHTML += `
             <div class="flex items-center justify-between bg-blue-100 text-blue-800 px-3 py-2 rounded-lg">
                 <span>${room}</span>
-                <button onclick="removeRoom('${room}')"
-                    class="text-red-600 hover:text-red-800">ลบ</button>
+                <button onclick="removeRoom('${room}')" class="text-red-600 hover:text-red-800">ลบ</button>
             </div>
         `;
     });

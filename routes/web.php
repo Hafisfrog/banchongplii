@@ -69,6 +69,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/teacher/course/create', function () {
         return view('teacher.course-create');
     })->name('teacher.course-create');
+    Route::get('/teacher/course/{id}', function ($id) {
+    return view('teacher.course-detail');  // หน้าแสดงรายละเอียดหลักสูตร
+})->name('course.detail');
+    Route::get('/teacher/courses', function () {
+    return view('teacher.course-create');
+})->name('teacher.courses');
+
+
 
     // DIRECTOR
     Route::get('/dashboard/director', function () {
