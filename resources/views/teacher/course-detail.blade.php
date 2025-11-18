@@ -18,15 +18,21 @@
     <!-- ========================= -->
     <div class="bg-white rounded-3xl shadow-md p-8 border border-gray-100">
 
-        <h3 class="text-xl font-semibold text-gray-800 mb-6">ข้อมูลหลักสูตร</h3>
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-semibold text-gray-800">ข้อมูลหลักสูตร</h3>
+
+            <button class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-xl">
+                 แก้ไขข้อมูลหลักสูตร
+            </button>
+        </div>
 
         @php
             $course = [
                 'name' => 'คณิตศาสตร์พื้นฐาน ป.1',
                 'rooms' => ['ป.1/1','ป.1/2'],
-                'term' => 1,
+                'term' => '',
                 'year' => 2567,
-                'description' => 'หลักสูตรนี้เน้นพื้นฐานการบวก ลบ การนับเลข และการแก้ปัญหาเบื้องต้น'
+                'description' => 'หลักสูตรนี้ครอบคลุมพื้นฐานการบวก ลบ การนับเลข และการแก้ปัญหาเบื้องต้น'
             ];
         @endphp
 
@@ -38,18 +44,27 @@
             </div>
 
             <div>
-                <p class="text-sm text-gray-500">ห้องเรียน</p>
+                <p class="text-sm text-gray-500">ห้องเรียนที่สอน</p>
                 <div class="flex flex-wrap gap-2 mt-1">
                     @foreach ($course['rooms'] as $room)
-                        <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-xl text-sm">{{ $room }}</span>
+                        <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-xl text-sm">
+                            {{ $room }}
+                        </span>
                     @endforeach
                 </div>
             </div>
 
             <div>
-                <p class="text-sm text-gray-500">ภาคเรียน</p>
-                <p class="font-semibold text-gray-800">{{ $course['term'] }}</p>
-            </div>
+    <p class="text-sm text-gray-500">ภาคเรียน</p>
+
+    <select
+        class="w-full border rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-blue-400 focus:outline-none">
+        <option value="">-- เลือกภาคเรียน --</option>
+        <option value="1" {{ $course['term'] == 1 ? 'selected' : '' }}>ภาคเรียนที่ 1</option>
+        <option value="2" {{ $course['term'] == 2 ? 'selected' : '' }}>ภาคเรียนที่ 2</option>
+    </select>
+</div>
+
 
             <div>
                 <p class="text-sm text-gray-500">ปีการศึกษา</p>
@@ -70,76 +85,130 @@
     <!-- ========================= -->
     <div class="bg-white rounded-3xl shadow-md p-8 border border-gray-100">
 
-        <h3 class="text-xl font-semibold text-gray-800 mb-4">ชั่วโมงที่สอน</h3>
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-semibold text-gray-800">ชั่วโมงที่สอน (ภาพรวม)</h3>
+
+            <button onclick="toggleHourInput()"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl">
+                 เพิ่มชั่วโมง
+            </button>
+        </div>
 
         <div id="hourList" class="space-y-3 mb-4">
+            
             <div class="p-4 bg-gray-100 rounded-xl flex justify-between">
                 <span>สอนทฤษฎี — 1 ชั่วโมง/สัปดาห์</span>
-                <button class="text-red-600 hover:text-red-800" onclick="this.closest('.p-4').remove()">ลบ</button>
+                <button class="text-red-600 hover:text-red-800" onclick="confirmDelete(this)">ลบ</button>
             </div>
 
             <div class="p-4 bg-gray-100 rounded-xl flex justify-between">
                 <span>สอนปฏิบัติ — 2 ชั่วโมง/สัปดาห์</span>
-                <button class="text-red-600 hover:text-red-800" onclick="this.closest('.p-4').remove()">ลบ</button>
+                <button class="text-red-600 hover:text-red-800" onclick="confirmDelete(this)">ลบ</button>
             </div>
+
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <input type="text" id="newHourName" placeholder="หัวข้อ เช่น ทฤษฎี / ปฏิบัติ"
-                   class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400">
+        <!-- input form -->
+        <div id="hourInputArea" class="grid grid-cols-1 md:grid-cols-3 gap-4 hidden">
+            <input type="text" id="newHourName" placeholder="หัวข้อ"
+                   class="border rounded-lg px-3 py-2">
 
-            <input type="number" id="newHourValue" placeholder="ชั่วโมง เช่น 1" min="1"
-                   class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400">
+            <input type="number" id="newHourValue" placeholder="ชั่วโมง" min="1"
+                   class="border rounded-lg px-3 py-2">
 
-            <button onclick="addTeachHour()"
-                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl">
-                 เพิ่มชั่วโมง
+            <button onclick="saveTeachHour()"
+                class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl">
+                ✔ บันทึก
             </button>
         </div>
     </div>
 
 
+
     <!-- ========================= -->
-    <!--          TOPICS           -->
+    <!--           TOPICS          -->
     <!-- ========================= -->
     <div class="bg-white rounded-3xl shadow-md p-8 border border-gray-100">
-        <h3 class="text-xl font-semibold text-gray-800 mb-4">เนื้อหาที่สอน</h3>
 
-        <div id="topicList" class="space-y-3 mb-4">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-semibold text-gray-800">เนื้อหาที่สอน + ระยะเวลา</h3>
 
-            <div class="p-4 bg-gray-100 rounded-xl flex justify-between">
-                <span>บทที่ 1 : การนับเลข 1–20</span>
-                <button class="text-red-600 hover:text-red-800" onclick="this.closest('.p-4').remove()">ลบ</button>
-            </div>
-
-            <div class="p-4 bg-gray-100 rounded-xl flex justify-between">
-                <span>บทที่ 2 : การบวกเลขพื้นฐาน</span>
-                <button class="text-red-600 hover:text-red-800" onclick="this.closest('.p-4').remove()">ลบ</button>
-            </div>
-        </div>
-
-        <div class="flex gap-3">
-            <input type="text" id="newTopic" placeholder="เพิ่มหัวข้อที่สอน"
-                   class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400">
-            <button onclick="addTopic()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl">
-                เพิ่ม
+            <button onclick="toggleTopicInput()"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl">
+                 เพิ่มหัวข้อ
             </button>
         </div>
-    </div>
 
-
-    <!-- ========================= -->
-    <!--       HOMEWORK AREA       -->
-    <!-- ========================= -->
-    <div class="bg-white rounded-3xl shadow-md p-8 border border-gray-100">
-        <h3 class="text-xl font-semibold text-gray-800 mb-4">การบ้าน / ชิ้นงาน</h3>
-
-        <div id="hwList" class="space-y-3 mb-4">
+        <div id="topicList" class="space-y-3">
 
             <div class="p-4 bg-gray-100 rounded-xl">
-                <div class="flex justify-between items-center">
+                <div class="flex justify-between">
+                    <span class="font-semibold">บทที่ 1 : การนับเลข 1–20</span>
+                    <button class="text-red-600 hover:text-red-800" onclick="confirmDelete(this)">ลบ</button>
+                </div>
+
+                <p class="text-sm text-gray-600 mt-1">
+                     ใช้เวลา: <b>4 ชั่วโมง</b> — ช่วงเวลา: <b>เดือน 1–2</b>
+                </p>
+
+                <button onclick="toggleDetail(this)" class="text-blue-600 text-sm mt-2">
+                    ▶ ดูรายละเอียด
+                </button>
+
+                <div class="hidden detail text-gray-600 mt-2 pl-4">
+                    - ตัวเลข 1–20<br>
+                    - การอ่านออกเสียง<br>
+                    - แบบฝึกหัดพื้นฐาน  
+                </div>
+            </div>
+
+        </div>
+
+        <!-- input topic -->
+        <div id="topicInput" class="grid grid-cols-1 md:grid-cols-4 gap-3 mt-3 hidden">
+
+            <input type="text" id="newTopic" placeholder="หัวข้อบทเรียน" class="border rounded-lg px-3 py-2 col-span-2">
+
+            <input type="number" id="newTopicHour" placeholder="ชั่วโมง" class="border rounded-lg px-3 py-2">
+
+            <select id="newTopicPeriod" class="border rounded-lg px-3 py-2">
+                <option value="">เลือกช่วงเวลา</option>
+                <option>เดือน 1–2</option>
+                <option>เดือน 3–4</option>
+                <option>สัปดาห์ 1–2</option>
+                <option>สัปดาห์ 3–4</option>
+            </select>
+
+            <button onclick="saveTopic()" class="bg-green-600 text-white px-4 py-2 rounded-xl col-span-4">
+                ✔ บันทึกหัวข้อเนื้อหา
+            </button>
+        </div>
+
+    </div>
+
+
+
+    <!-- ========================= -->
+    <!--        HOMEWORK AREA      -->
+    <!-- ========================= -->
+    <div class="bg-white rounded-3xl shadow-md p-8 border border-gray-100">
+
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-semibold text-gray-800">การบ้าน / ชิ้นงาน</h3>
+
+            <button onclick="toggleHWInput()"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl">
+                 เพิ่มการบ้าน
+            </button>
+        </div>
+
+        <div id="hwList" class="space-y-3">
+
+            <div class="p-4 bg-gray-100 rounded-xl">
+                <div class="flex justify-between">
                     <span class="font-semibold">ใบงานที่ 1 : นับจำนวนรูปภาพ</span>
-                    <button class="text-red-600 hover:text-red-800" onclick="this.closest('.p-4').remove()">ลบ</button>
+                    <button class="text-red-600 hover:text-red-800"
+                            onclick="confirmDelete(this)">ลบ</button>
                 </div>
 
                 <p class="text-sm text-gray-600 mt-1">📅 กำหนดส่ง: 12 มกราคม 2568</p>
@@ -148,24 +217,25 @@
 
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
+        <!-- input HW -->
+        <div id="hwInput" class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3 hidden">
 
-            <input type="text" id="newHW" placeholder="ชื่อการบ้าน เช่น ใบงานที่ 2"
-                   class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400">
+            <input type="text" id="newHW" placeholder="ชื่อการบ้าน"
+                   class="border rounded-lg px-3 py-2">
 
             <input type="date" id="newHWDate"
-                   class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400">
+                   class="border rounded-lg px-3 py-2">
 
-            <input type="number" id="newHWScore" placeholder="คะแนนเต็ม" min="1"
-                   class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400">
+            <input type="number" id="newHWScore" placeholder="คะแนนเต็ม"
+                   class="border rounded-lg px-3 py-2">
+
+            <button onclick="saveHW()"
+                class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl col-span-3">
+                ✔ บันทึกการบ้าน
+            </button>
         </div>
 
-        <button onclick="addHW()"
-                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl">
-             เพิ่มการบ้าน
-        </button>
     </div>
-
 
 </div>
 @endsection
@@ -177,60 +247,120 @@
 <!-- ============================= -->
 <script>
 
-// =============================
-// เพิ่มหัวข้อเนื้อหา
-// =============================
-function addTopic() {
-    let topic = document.getElementById("newTopic").value.trim();
-    if (!topic) return;
-
-    document.getElementById("topicList").insertAdjacentHTML("beforeend", `
-        <div class="p-4 bg-gray-100 rounded-xl flex justify-between">
-            <span>${topic}</span>
-            <button class="text-red-600 hover:text-red-800" onclick="this.closest('.p-4').remove()">ลบ</button>
-        </div>
-    `);
-
-    document.getElementById("newTopic").value = "";
+// ----------------------------- //
+//        DELETE CONFIRM         //
+// ----------------------------- //
+function confirmDelete(btn){
+    if(confirm("ยืนยันการลบข้อมูลนี้?")){
+        btn.closest(".p-4").remove();
+    }
 }
 
 
+// ----------------------------- //
+//          TEACH HOURS          //
+// ----------------------------- //
+function toggleHourInput(){
+    hourInputArea.classList.toggle("hidden");
+}
 
-// =============================
-// เพิ่มชั่วโมงสอน
-// =============================
-function addTeachHour() {
-    let name = document.getElementById("newHourName").value.trim();
-    let hour = document.getElementById("newHourValue").value.trim();
+function saveTeachHour(){
+    let name = newHourName.value.trim();
+    let hour = newHourValue.value.trim();
 
-    if (!name || !hour) {
+    if(!name || !hour){
         alert("กรุณากรอกข้อมูลให้ครบ");
         return;
     }
 
-    document.getElementById("hourList").insertAdjacentHTML("beforeend", `
+    hourList.insertAdjacentHTML("beforeend", `
         <div class="p-4 bg-gray-100 rounded-xl flex justify-between">
             <span>${name} — ${hour} ชั่วโมง/สัปดาห์</span>
-            <button class="text-red-600 hover:text-red-800" onclick="this.closest('.p-4').remove()">ลบ</button>
+            <button class="text-red-600 hover:text-red-800"
+                    onclick="confirmDelete(this)">ลบ</button>
         </div>
     `);
 
-    document.getElementById("newHourName").value = "";
-    document.getElementById("newHourValue").value = "";
+    newHourName.value = "";
+    newHourValue.value = "";
+    hourInputArea.classList.add("hidden");
 }
 
 
 
-// =============================
-//  เพิ่มการบ้าน + แปลง ค.ศ. → พ.ศ.
-// =============================
-function addHW() {
+// ----------------------------- //
+//     TOPICS + RELATION HOURS   //
+// ----------------------------- //
+function toggleDetail(btn){
+    let box = btn.nextElementSibling;
+    box.classList.toggle("hidden");
 
-    let hw = document.getElementById("newHW").value.trim();
-    let date = document.getElementById("newHWDate").value;
-    let score = document.getElementById("newHWScore").value;
+    btn.innerText = box.classList.contains("hidden")
+        ? "▶ ดูรายละเอียด"
+        : "▼ ซ่อนรายละเอียด";
+}
 
-    if (!hw || !date || !score) {
+function toggleTopicInput(){
+    topicInput.classList.toggle("hidden");
+}
+
+function saveTopic(){
+
+    let title = newTopic.value.trim();
+    let hour = newTopicHour.value.trim();
+    let period = newTopicPeriod.value;
+
+    if(!title || !hour || !period){
+        alert("กรุณากรอกข้อมูลให้ครบ");
+        return;
+    }
+
+    topicList.insertAdjacentHTML("beforeend", `
+        <div class="p-4 bg-gray-100 rounded-xl">
+
+            <div class="flex justify-between">
+                <span class="font-semibold">${title}</span>
+                <button class="text-red-600 hover:text-red-800" onclick="confirmDelete(this)">ลบ</button>
+            </div>
+
+            <p class="text-sm text-gray-600 mt-1">
+                 ใช้เวลา: <b>${hour} ชั่วโมง</b> — ช่วงเวลา: <b>${period}</b>
+            </p>
+
+            <button onclick="toggleDetail(this)" class="text-blue-600 text-sm mt-2">
+                ▶ ดูรายละเอียด
+            </button>
+
+            <div class="hidden detail text-gray-600 mt-2 pl-4">
+                - เพิ่มรายละเอียดเพิ่มเติมได้ในภายหลัง
+            </div>
+
+        </div>
+    `);
+
+    newTopic.value = "";
+    newTopicHour.value = "";
+    newTopicPeriod.value = "";
+
+    topicInput.classList.add("hidden");
+}
+
+
+
+// ----------------------------- //
+//            HOMEWORK           //
+// ----------------------------- //
+function toggleHWInput(){
+    hwInput.classList.toggle("hidden");
+}
+
+function saveHW(){
+
+    let hw = newHW.value.trim();
+    let date = newHWDate.value;
+    let score = newHWScore.value;
+
+    if(!hw || !date || !score){
         alert("กรุณากรอกข้อมูลให้ครบ");
         return;
     }
@@ -238,29 +368,27 @@ function addHW() {
     // แปลง ค.ศ. → พ.ศ.
     const d = new Date(date);
     const thaiYear = d.getFullYear() + 543;
+    const thaiMonths = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน",
+                        "กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
 
-    const thaiMonths = [
-        "มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน",
-        "กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"
-    ];
+    const formatted = `${d.getDate()} ${thaiMonths[d.getMonth()]} ${thaiYear}`;
 
-    const formattedThai = `${d.getDate()} ${thaiMonths[d.getMonth()]} ${thaiYear}`;
-
-    document.getElementById("hwList").insertAdjacentHTML("beforeend", `
+    hwList.insertAdjacentHTML("beforeend", `
         <div class="p-4 bg-gray-100 rounded-xl">
-            <div class="flex justify-between items-center">
+            <div class="flex justify-between">
                 <span class="font-semibold">${hw}</span>
-                <button class="text-red-600 hover:text-red-800" onclick="this.closest('.p-4').remove()">ลบ</button>
+                <button class="text-red-600 hover:text-red-800" onclick="confirmDelete(this)">ลบ</button>
             </div>
 
-            <p class="text-sm text-gray-600 mt-1"> กำหนดส่ง: ${formattedThai}</p>
+            <p class="text-sm text-gray-600 mt-1"> กำหนดส่ง: ${formatted}</p>
             <p class="text-sm text-gray-600"> คะแนนเต็ม: ${score} คะแนน</p>
         </div>
     `);
 
-    document.getElementById("newHW").value = "";
-    document.getElementById("newHWDate").value = "";
-    document.getElementById("newHWScore").value = "";
+    newHW.value = "";
+    newHWDate.value = "";
+    newHWScore.value = "";
+    hwInput.classList.add("hidden");
 }
 
 </script>

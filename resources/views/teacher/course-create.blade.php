@@ -36,6 +36,7 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">ชั้นเรียน</label>
 
                 <select id="gradeSelect"
+                        onchange="updateRoomOptions()"
                         class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400">
                     <option value="">-- เลือกชั้นเรียน --</option>
                     @for ($g = 1; $g <= 6; $g++)
@@ -44,38 +45,22 @@
                 </select>
             </div>
 
-            <!-- เพิ่มห้องไม่จำกัด -->
+            <!-- เลือกห้องแบบ Checkbox -->
             <div class="mt-3">
                 <label class="block text-sm font-medium text-gray-700 mb-1">
-                    เพิ่มห้องเรียน (ไม่จำกัดจำนวน)
+                    เลือกห้องเรียน (เลือกหลายห้องได้)
                 </label>
 
-                <div class="flex gap-3">
-
-                    <!-- ช่องกรอกเลขห้อง -->
-                    <input id="roomNumberInput"
-                        type="number"
-                        class="w-32 border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400"
-                        placeholder="เช่น 1">
-
-                    <!-- ปุ่มเพิ่ม -->
-                    <button type="button"
-                            onclick="addRoom()"
-                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl">
-                        เพิ่มห้อง
-                    </button>
+                <div id="roomCheckboxes" class="space-y-2 text-sm text-gray-700">
+                    <p class="text-gray-400">-- เลือกชั้นเรียนก่อน --</p>
                 </div>
 
-                <p class="text-xs text-gray-500 mt-1">
-                    ระบบจะสร้างเป็น "ป.X/ห้อง" อัตโนมัติ เช่น ป.2/5
-                </p>
-
-                <!-- แสดงรายการห้องที่เลือก -->
-                <div id="selectedRooms" class="mt-3 space-y-2"></div>
+                <!-- ห้องที่ถูกเลือก -->
+                <div id="selectedRooms" class="mt-4 space-y-2"></div>
             </div>
 
             <!-- ภาคเรียน + ปี -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {{-- <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">ภาคเรียน</label>
@@ -92,7 +77,7 @@
                            placeholder="เช่น 2567">
                 </div>
 
-            </div>
+            </div> --}}
 
             <!-- รายละเอียดหลักสูตร -->
             <div>
@@ -137,7 +122,6 @@
                 @foreach ($mockCourses as $c)
                 <tr class="hover:bg-blue-50 transition">
 
-                    <!-- ชื่อหลักสูตรคลิกได้ -->
                     <td class="py-2 px-4">
                         <a href="{{ route('course.detail', $loop->index) }}"
                            class="text-blue-600 hover:underline font-medium">
@@ -145,7 +129,6 @@
                         </a>
                     </td>
 
-                    <!-- ห้องเรียน -->
                     <td class="py-2 px-4 text-center">
                         @foreach ($c['rooms'] as $r)
                             <span class="inline-block bg-blue-100 text-blue-700 px-2 py-1 rounded-lg text-xs mr-1">
@@ -158,19 +141,14 @@
                     <td class="py-2 px-4 text-center">{{ $c['year'] }}</td>
 
                     <td class="py-2 px-4 text-center">
-
-                        <!-- ปุ่มดูรายละเอียด -->
                         <a href="{{ route('course.detail', $loop->index) }}"
-                           class="text-blue-600 hover:underline font-medium">
-                            ดูรายละเอียด
-                        </a>
+                           class="text-blue-600 hover:underline font-medium">ดูรายละเอียด</a>
                         |
-
                         <button class="text-yellow-600 hover:underline">แก้ไข</button>
                         |
                         <button class="text-red-600 hover:underline">ลบ</button>
-
                     </td>
+
                 </tr>
                 @endforeach
             </tbody>
@@ -181,57 +159,81 @@
 @endsection
 
 
-<!-- ============================================== -->
-<!--                  SCRIPT DROPDOWN               -->
-<!-- ============================================== -->
-<script>
-let selectedRoomList = [];
 
-/* เพิ่มห้องเข้า list */
-function addRoom() {
-    let grade = document.getElementById("gradeSelect").value;
-    let roomNumber = document.getElementById("roomNumberInput").value.trim();
+<!-- ============================= -->
+<!--            SCRIPT             -->
+<!-- ============================= -->
+<script>
+
+let selectedRooms = [];
+
+/* อัปเดตรายการ checkbox เมื่อเลือกชั้นเรียน */
+function updateRoomOptions() {
+    const grade = document.getElementById("gradeSelect").value;
+    const container = document.getElementById("roomCheckboxes");
+
+    container.innerHTML = "";
 
     if (!grade) {
-        alert("กรุณาเลือกชั้นเรียนก่อน");
+        container.innerHTML = `<p class="text-gray-400">-- เลือกชั้นเรียนก่อน --</p>`;
         return;
     }
 
-    if (!roomNumber || roomNumber <= 0) {
-        alert("กรุณากรอกเลขห้องให้ถูกต้อง");
-        return;
+    // ห้อง 1–10
+    for (let i = 1; i <= 10; i++) {
+        let roomName = `${grade}/${i}`;
+
+        container.innerHTML += `
+            <label class="flex items-center gap-2">
+                <input type="checkbox" value="${roomName}"
+                       onchange="toggleRoom(this)"
+                       class="w-4 h-4 text-blue-600">
+                ${roomName}
+            </label>
+        `;
+    }
+}
+
+/* เลือก / ยกเลิกห้อง */
+function toggleRoom(checkbox) {
+    let room = checkbox.value;
+
+    if (checkbox.checked) {
+        if (!selectedRooms.includes(room)) selectedRooms.push(room);
+    } else {
+        selectedRooms = selectedRooms.filter(r => r !== room);
     }
 
-    let roomName = `${grade}/${roomNumber}`;
-
-    if (selectedRoomList.includes(roomName)) {
-        alert("เพิ่มห้องนี้แล้ว");
-        return;
-    }
-
-    selectedRoomList.push(roomName);
-    document.getElementById("roomNumberInput").value = "";
     renderSelectedRooms();
+}
+
+/* แสดงห้องที่เลือก */
+function renderSelectedRooms() {
+    let html = "";
+
+    selectedRooms.forEach(room => {
+        html += `
+            <div class="flex items-center justify-between bg-blue-100 text-blue-800 
+                        px-3 py-2 rounded-lg">
+                <span>${room}</span>
+                <button onclick="removeRoom('${room}')"
+                        class="text-red-600 hover:text-red-800 text-sm">ลบ</button>
+            </div>
+        `;
+    });
+
+    document.getElementById("selectedRooms").innerHTML = html;
 }
 
 /* ลบห้อง */
 function removeRoom(room) {
-    selectedRoomList = selectedRoomList.filter(r => r !== room);
+    selectedRooms = selectedRooms.filter(r => r !== room);
     renderSelectedRooms();
-}
 
-/* แสดงรายการห้องที่เลือก */
-function renderSelectedRooms() {
-    let container = document.getElementById("selectedRooms");
-    container.innerHTML = "";
-
-    selectedRoomList.forEach(room => {
-        container.innerHTML += `
-            <div class="flex items-center justify-between bg-blue-100 text-blue-800 px-3 py-2 rounded-lg">
-                <span>${room}</span>
-                <button onclick="removeRoom('${room}')" class="text-red-600 hover:text-red-800">ลบ</button>
-            </div>
-        `;
+    // เอาติ๊ก checkbox ออกด้วย
+    document.querySelectorAll("#roomCheckboxes input").forEach(cb => {
+        if (cb.value === room) cb.checked = false;
     });
 }
+
 </script>
