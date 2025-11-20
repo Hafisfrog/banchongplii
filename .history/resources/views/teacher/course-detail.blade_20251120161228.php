@@ -17,7 +17,7 @@
                 </p>
                 <div class="flex flex-wrap gap-3">
                     <a href="{{ route('teacher.course-create') }}"
-                        class="px-4 py-2 bg-gray-100 rounded-xl text-gray-700 text-sm">
+                       class="px-4 py-2 bg-gray-100 rounded-xl text-gray-700 text-sm">
                         กลับไปหน้าสร้างหลักสูตร
                     </a>
                     {{-- ปุ่มแก้ไขถูกย้ายไปอยู่ในการ์ดข้อมูลหลักสูตรด้านล่างแล้ว --}}
@@ -29,7 +29,7 @@
                         เลือกหลักสูตร
                     </label>
                     <select id="courseSelector"
-                        class="w-full border border-gray-200 rounded-2xl px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            class="w-full border border-gray-200 rounded-2xl px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         @foreach($courseOptions as $courseOption)
                             <option value="{{ route('course.detail', $courseOption) }}"
                                 @selected(optional($course)->id === $courseOption->id)>
@@ -53,7 +53,7 @@
                 กรุณาสร้างหลักสูตรใหม่หรือเลือกจากรายการด้านบน
             </p>
             <a href="{{ route('teacher.course-create') }}"
-                class="inline-flex items-center px-5 py-3 bg-blue-600 text-white rounded-2xl shadow hover:bg-blue-500 transition">
+               class="inline-flex items-center px-5 py-3 bg-blue-600 text-white rounded-2xl shadow hover:bg-blue-500 transition">
                 เพิ่มหลักสูตรใหม่
             </a>
         </div>
@@ -78,27 +78,23 @@
                             @endforelse
                         </div>
                     </div>
-                     <div>
-    <label class="block text-sm font-medium text-gray-700 mb-1">ภาคเรียน</label>
+                    <div>
+    <p class="text-sm text-gray-500">ภาคเรียน</p>
     <select
-        name="term"
-        class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400"
+        class="mt-1 w-full md:w-40 border border-gray-200 rounded-xl px-3 py-2 text-sm font-semibold text-gray-900 bg-white"
+        disabled
     >
-        {{-- ค่าเริ่มต้นเป็นค่าว่าง --}}
-        <option value="" {{ is_null($course->term) ? 'selected' : '' }}>
+        <option value="">
             -- เลือกภาคเรียน --
         </option>
-
-        <option value="1" {{ (string) $course->term === '1' ? 'selected' : '' }}>
+        <option value="1" {{ $course->term == 1 ? 'selected' : '' }}>
             ภาคเรียนที่ 1
         </option>
-
-        <option value="2" {{ (string) $course->term === '2' ? 'selected' : '' }}>
+        <option value="2" {{ $course->term == 2 ? 'selected' : '' }}>
             ภาคเรียนที่ 2
         </option>
     </select>
 </div>
-
 
                     <div>
                         <p class="text-sm text-gray-500">ปีการศึกษา</p>
@@ -115,7 +111,7 @@
                 {{-- ปุ่มแก้ไขข้อมูลหลักสูตร ด้านขวา (ตรงช่องที่เคยโล่ง) --}}
                 <div class="md:w-auto md:text-right">
                     <a href="{{ route('teacher.courses.edit', $course) }}"
-                        class="inline-flex items-center px-5 py-2 bg-blue-600 text-white rounded-xl shadow hover:bg-blue-500 transition">
+                       class="inline-flex items-center px-5 py-2 bg-blue-600 text-white rounded-xl shadow hover:bg-blue-500 transition">
                         แก้ไขข้อมูลหลักสูตร
                     </a>
                 </div>
@@ -129,7 +125,8 @@
                     <h3 class="text-xl font-semibold text-gray-900">ชั่วโมงที่สอน (ภาพรวม)</h3>
                     <p class="text-sm text-gray-500">หมวดหมู่และจำนวนชั่วโมง</p>
                 </div>
-                <button type="button" class="px-4 py-2 bg-blue-600 text-white rounded-xl" onclick="toggleForm('hourForm')">
+                <button type="button" class="px-4 py-2 bg-blue-600 text-white rounded-xl"
+                        onclick="toggleForm('hourForm')">
                     เพิ่มชั่วโมง
                 </button>
             </div>
@@ -148,8 +145,8 @@
                             @endif
                         </div>
                         <form method="POST"
-                            action="{{ route('teacher.courses.hours.destroy', ['course' => $course, 'hour' => $hour['id'] ?? '']) }}"
-                            onsubmit="return confirm('ยืนยันการลบข้อมูลชุดนี้หรือไม่?')">
+                              action="{{ route('teacher.courses.hours.destroy', ['course' => $course, 'hour' => $hour['id'] ?? '']) }}"
+                              onsubmit="return confirm('ยืนยันการลบข้อมูลชุดนี้หรือไม่?')">
                             @csrf
                             @method('DELETE')
                             <button class="text-red-600 text-sm hover:underline">ลบ</button>
@@ -161,15 +158,15 @@
             </div>
 
             <form id="hourForm" method="POST" action="{{ route('teacher.courses.hours.store', $course) }}"
-                class="hidden mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+                  class="hidden mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
                 @csrf
                 <select name="category" class="border rounded-xl px-3 py-2" required>
                     <option value="">เลือกหมวดหมู่</option>
                     <option value="ทฤษฎี">ทฤษฎี</option>
                     <option value="ปฏิบัติ">ปฏิบัติ</option>
                 </select>
-                <input type="number" step="0.1" name="hours" class="border rounded-xl px-3 py-2" placeholder="ชั่วโมง"
-                    required>
+                <input type="number" step="0.1" name="hours" class="border rounded-xl px-3 py-2"
+                       placeholder="ชั่วโมง" required>
                 <select name="unit" class="border rounded-xl px-3 py-2" required>
                     <option value="">เลือกหน่วย</option>
                     <option value="ชั่วโมง/สัปดาห์">ชั่วโมง/สัปดาห์</option>
@@ -189,7 +186,7 @@
                     <p class="text-sm text-gray-500">หัวข้อบทเรียนและจำนวนชั่วโมง</p>
                 </div>
                 <button type="button" class="px-4 py-2 bg-blue-600 text-white rounded-xl"
-                    onclick="toggleForm('lessonForm')">
+                        onclick="toggleForm('lessonForm')">
                     เพิ่มหัวข้อ
                 </button>
             </div>
@@ -207,8 +204,8 @@
                             @endif
                         </div>
                         <form method="POST"
-                            action="{{ route('teacher.courses.lessons.destroy', ['course' => $course, 'lesson' => $lesson['id'] ?? '']) }}"
-                            onsubmit="return confirm('ยืนยันการลบบทเรียนนี้?')">
+                              action="{{ route('teacher.courses.lessons.destroy', ['course' => $course, 'lesson' => $lesson['id'] ?? '']) }}"
+                              onsubmit="return confirm('ยืนยันการลบบทเรียนนี้?')">
                             @csrf
                             @method('DELETE')
                             <button class="text-red-600 text-sm hover:underline">ลบ</button>
@@ -220,13 +217,13 @@
             </div>
 
             <form id="lessonForm" method="POST" action="{{ route('teacher.courses.lessons.store', $course) }}"
-                class="hidden mt-6 space-y-4">
+                  class="hidden mt-6 space-y-4">
                 @csrf
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <input type="text" name="title" class="border rounded-xl px-3 py-2" placeholder="หัวข้อ" required>
                     <select name="hours" class="border rounded-xl px-3 py-2" required>
                         <option value="">เลือกชั่วโมง</option>
-                        @foreach([1, 2, 3, 4, 5] as $hourOption)
+                        @foreach([1,2,3,4,5] as $hourOption)
                             <option value="{{ $hourOption }}">{{ $hourOption }} ชั่วโมง</option>
                         @endforeach
                     </select>
@@ -237,7 +234,7 @@
                     </select>
                 </div>
                 <textarea name="details" rows="3" class="w-full border rounded-xl px-3 py-2"
-                    placeholder="รายละเอียดเพิ่มเติม"></textarea>
+                          placeholder="รายละเอียดเพิ่มเติม"></textarea>
                 <div class="text-right">
                     <button type="submit" class="px-5 py-2 bg-blue-600 text-white rounded-xl">บันทึกหัวข้อ</button>
                 </div>
@@ -252,7 +249,7 @@
                     <p class="text-sm text-gray-500">ข้อมูลการมอบหมายงานให้ผู้เรียน</p>
                 </div>
                 <button type="button" class="px-4 py-2 bg-blue-600 text-white rounded-xl"
-                    onclick="toggleForm('assignmentForm')">
+                        onclick="toggleForm('assignmentForm')">
                     เพิ่มการบ้าน
                 </button>
             </div>
@@ -275,8 +272,8 @@
                             @endif
                         </div>
                         <form method="POST"
-                            action="{{ route('teacher.courses.assignments.destroy', ['course' => $course, 'assignment' => $assignment['id'] ?? '']) }}"
-                            onsubmit="return confirm('ยืนยันการลบการบ้านนี้?')">
+                              action="{{ route('teacher.courses.assignments.destroy', ['course' => $course, 'assignment' => $assignment['id'] ?? '']) }}"
+                              onsubmit="return confirm('ยืนยันการลบการบ้านนี้?')">
                             @csrf
                             @method('DELETE')
                             <button class="text-red-600 text-sm hover:underline">ลบ</button>
@@ -287,8 +284,9 @@
                 @endforelse
             </div>
 
-            <form id="assignmentForm" method="POST" action="{{ route('teacher.courses.assignments.store', $course) }}"
-                class="hidden mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+            <form id="assignmentForm" method="POST"
+                  action="{{ route('teacher.courses.assignments.store', $course) }}"
+                  class="hidden mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
                 @csrf
                 <select name="title" class="border rounded-xl px-3 py-2" required {{ empty($course->lessons) ? 'disabled' : '' }}>
                     <option value="">เลือกหัวข้อจากบทเรียน</option>
@@ -297,12 +295,12 @@
                     @endforeach
                 </select>
                 <input type="date" name="due_date" class="border rounded-xl px-3 py-2">
-                <input type="number" step="0.1" name="score" class="border rounded-xl px-3 py-2" placeholder="คะแนนรวม"
-                    required>
+                <input type="number" step="0.1" name="score" class="border rounded-xl px-3 py-2" placeholder="คะแนนรวม" required>
                 <textarea name="notes" rows="1" class="border rounded-xl px-3 py-2"
-                    placeholder="รายละเอียดงานเพิ่มเติม"></textarea>
+                          placeholder="รายละเอียดงานเพิ่มเติม"></textarea>
                 <div class="md:col-span-4 text-right">
-                    <button type="submit" class="px-5 py-2 bg-blue-600 text-white rounded-xl" {{ empty($course->lessons) ? 'disabled' : '' }}>
+                    <button type="submit" class="px-5 py-2 bg-blue-600 text-white rounded-xl"
+                        {{ empty($course->lessons) ? 'disabled' : '' }}>
                         บันทึกการบ้าน
                     </button>
                 </div>

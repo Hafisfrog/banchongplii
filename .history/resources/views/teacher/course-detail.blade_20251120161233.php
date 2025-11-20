@@ -78,27 +78,22 @@
                             @endforelse
                         </div>
                     </div>
-                     <div>
-    <label class="block text-sm font-medium text-gray-700 mb-1">ภาคเรียน</label>
-    <select
-        name="term"
-        class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400"
-    >
-        {{-- ค่าเริ่มต้นเป็นค่าว่าง --}}
-        <option value="" {{ is_null($course->term) ? 'selected' : '' }}>
-            -- เลือกภาคเรียน --
-        </option>
-
-        <option value="1" {{ (string) $course->term === '1' ? 'selected' : '' }}>
-            ภาคเรียนที่ 1
-        </option>
-
-        <option value="2" {{ (string) $course->term === '2' ? 'selected' : '' }}>
-            ภาคเรียนที่ 2
-        </option>
-    </select>
-</div>
-
+                    <div>
+                        <p class="text-sm text-gray-500">ภาคเรียน</p>
+                        <select
+                            class="mt-1 w-full md:w-40 border border-gray-200 rounded-xl px-3 py-2 text-sm font-semibold text-gray-900 bg-white"
+                            disabled>
+                            <option value="">
+                                -- เลือกภาคเรียน --
+                            </option>
+                            <option value="1" {{ $course->term == 1 ? 'selected' : '' }}>
+                                ภาคเรียนที่ 1
+                            </option>
+                            <option value="2" {{ $course->term == 2 ? 'selected' : '' }}>
+                                ภาคเรียนที่ 2
+                            </option>
+                        </select>
+                    </div>
 
                     <div>
                         <p class="text-sm text-gray-500">ปีการศึกษา</p>
