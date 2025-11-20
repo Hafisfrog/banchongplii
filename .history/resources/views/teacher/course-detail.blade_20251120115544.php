@@ -13,46 +13,6 @@
         <p class="text-gray-600 mt-2">ดูรายละเอียดของหลักสูตรที่ครูกำลังสอน</p>
     </div>
 
-    {{-- =========================  --}}
-    {{--    DROPDOWN เลือกหลักสูตร  --}}
-    {{-- =========================  --}}
-    @php
-        // ถ้า Controller ส่ง $courses มา ก็จะมีตัวเลือกให้เลือกหลักสูตร
-        $courseOptions = collect($courses ?? []);
-    @endphp
-
-    <div class="bg-white rounded-3xl shadow-md p-8 border border-gray-100 mb-2">
-        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-            <div>
-                <h3 class="text-xl font-semibold text-gray-800">เลือกหลักสูตร</h3>
-                <p class="text-gray-500 text-sm mt-1">
-                    เลือกหลักสูตรที่ครูสร้างไว้เพื่อดูรายละเอียดและจัดการข้อมูล
-                </p>
-            </div>
-
-            <div class="w-full md:w-80">
-                @if($courseOptions->isNotEmpty())
-                    <label for="courseSelector" class="block text-sm text-gray-600 mb-1">
-                        เลือกหลักสูตร
-                    </label>
-                    <select id="courseSelector"
-                            class="w-full border border-gray-300 rounded-2xl px-4 py-2
-                                   focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                        @foreach($courseOptions as $courseOption)
-                            <option value="{{ route('course.detail', $courseOption) }}">
-                                {{ $courseOption->name }} ({{ $courseOption->grade ?? '-' }})
-                            </option>
-                        @endforeach
-                    </select>
-                @else
-                    <p class="text-gray-500 text-sm">
-                        ยังไม่มีหลักสูตรที่สร้างไว้ กรุณาไปที่เมนู "สร้างหลักสูตร" ก่อน
-                    </p>
-                @endif
-            </div>
-        </div>
-    </div>
-
     <!-- ========================= -->
     <!--     COURSE INFORMATION    -->
     <!-- ========================= -->
@@ -67,7 +27,6 @@
         </div>
 
         @php
-            // ตัวอย่างข้อมูลหลักสูตร (เดโม่)
             $course = [
                 'name' => 'คณิตศาสตร์พื้นฐาน ป.1',
                 'rooms' => ['ป.1/1','ป.1/2'],
@@ -133,17 +92,28 @@
             </button>
         </div>
 
-        {{-- การ์ดชั่วโมง จะถูกเติมด้วย JS --}}
-        <div id="hourList" class="space-y-3 mb-4"></div>
+        <div id="hourList" class="space-y-3 mb-4">
+            <div class="p-4 bg-gray-100 rounded-xl flex justify-between">
+                <span>สอนทฤษฎี — 1 ชั่วโมง/สัปดาห์</span>
+                <button type="button" class="text-red-600 hover:text-red-800" onclick="confirmDelete(this)">ลบ</button>
+            </div>
+
+            <div class="p-4 bg-gray-100 rounded-xl flex justify-between">
+                <span>สอนปฏิบัติ — 2 ชั่วโมง/สัปดาห์</span>
+                <button type="button" class="text-red-600 hover:text-red-800" onclick="confirmDelete(this)">ลบ</button>
+            </div>
+        </div>
 
         <!-- input form -->
         <div id="hourInputArea" class="grid grid-cols-1 md:grid-cols-3 gap-4 hidden">
+            <!-- dropdown หัวข้อ ทฤษฎี/ปฏิบัติ -->
             <select id="newHourName" class="border rounded-lg px-3 py-2">
                 <option value="">เลือกหัวข้อ</option>
                 <option value="สอนทฤษฎี">ทฤษฎี</option>
                 <option value="สอนปฏิบัติ">ปฏิบัติ</option>
             </select>
 
+            <!-- dropdown ชั่วโมง 1,2 -->
             <select id="newHourValue" class="border rounded-lg px-3 py-2">
                 <option value="">เลือกชั่วโมง</option>
                 <option value="1">1 ชั่วโมง</option>
@@ -173,6 +143,7 @@
             </button>
         </div>
 
+        {{-- รายการหัวข้อ จะถูกเติมด้วย JS --}}
         <div id="topicList" class="space-y-3"></div>
 
         <!-- input topic -->
@@ -181,6 +152,7 @@
             <input type="text" id="newTopic" placeholder="หัวข้อบทเรียน"
                    class="border rounded-lg px-3 py-2 col-span-2">
 
+            <!-- dropdown ชั่วโมง 1–5 -->
             <select id="newTopicHour" class="border rounded-lg px-3 py-2">
                 <option value="">ชั่วโมง</option>
                 <option value="1">1 ชั่วโมง</option>
@@ -225,11 +197,24 @@
             </button>
         </div>
 
-        <div id="hwList" class="space-y-3"></div>
+        <div id="hwList" class="space-y-3">
+            <div class="p-4 bg-gray-100 rounded-xl">
+                <div class="flex justify-between">
+                    <span class="font-semibold">ใบงานที่ 1 : นับจำนวนรูปภาพ</span>
+                    <button type="button" class="text-red-600 hover:text-red-800"
+                            onclick="confirmDelete(this)">ลบ</button>
+                </div>
+
+                <p class="text-sm text-gray-600 mt-1">📅 กำหนดส่ง: 12 มกราคม 2568</p>
+                <p class="text-sm text-gray-600">🏆 คะแนนเต็ม: 10 คะแนน</p>
+                <p class="text-sm text-gray-600 mt-1">รายละเอียด: ทำแบบฝึกหัดจากใบงานที่ 1</p>
+            </div>
+        </div>
 
         <!-- input HW -->
         <div id="hwInput" class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3 hidden">
 
+            <!-- dropdown ชื่อการบ้านอิงจากหัวข้อเนื้อหา -->
             <select id="newHW" class="border rounded-lg px-3 py-2">
                 <option value="">เลือกหัวข้อบทเรียน</option>
             </select>
@@ -240,6 +225,7 @@
             <input type="number" id="newHWScore" placeholder="คะแนนเต็ม"
                    class="border rounded-lg px-3 py-2">
 
+            <!-- ช่องรายละเอียดการบ้าน -->
             <textarea id="newHWDetail" rows="2"
                       class="border rounded-lg px-3 py-2 md:col-span-3"
                       placeholder="รายละเอียดงาน / คำอธิบายการบ้าน"></textarea>
@@ -261,71 +247,7 @@
 <!--             SCRIPT            -->
 <!-- ============================= -->
 <script>
-// ---------- helper format thai date ----------
-function formatThaiDate(iso) {
-    if (!iso) return '-';
-    const d = new Date(iso);
-    if (isNaN(d.getTime())) return '-';
-    const months = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน",
-                    "กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
-    const year = d.getFullYear() + 543;
-    return `${d.getDate()} ${months[d.getMonth()]} ${year}`;
-}
-
-// ---------- create cards (hour / topic / homework) ----------
-function createHourCard(category, hours) {
-    category = category || 'สอนทฤษฎี';
-    hours    = hours || '1';
-    return `
-    <div class="p-4 bg-gray-100 rounded-xl hour-card">
-        <div class="flex justify-between">
-            <span class="hour-display">
-                <span class="hour-category">${category}</span>
-                —
-                <span class="hour-value">${hours}</span> ชั่วโมง/สัปดาห์
-            </span>
-            <div class="flex gap-3">
-                <button type="button"
-                        class="text-blue-600 hover:text-blue-800 text-sm"
-                        onclick="toggleHourEdit(this)">
-                    แก้ไข
-                </button>
-                <button type="button"
-                        class="text-red-600 hover:text-red-800 text-sm"
-                        onclick="confirmDelete(this)">
-                    ลบ
-                </button>
-            </div>
-        </div>
-
-        <div class="hidden edit-block mt-3 border-t pt-3 grid grid-cols-1 md:grid-cols-3 gap-3">
-            <select class="border rounded-lg px-3 py-2 edit-hour-category">
-                <option value="สอนทฤษฎี">ทฤษฎี</option>
-                <option value="สอนปฏิบัติ">ปฏิบัติ</option>
-            </select>
-
-            <select class="border rounded-lg px-3 py-2 edit-hour-value">
-                <option value="1">1 ชั่วโมง</option>
-                <option value="2">2 ชั่วโมง</option>
-            </select>
-
-            <div class="flex justify-end gap-2 md:col-span-3">
-                <button type="button"
-                        class="px-3 py-1 rounded-lg bg-gray-200 text-gray-700 text-sm"
-                        onclick="cancelHourEdit(this)">
-                    ยกเลิก
-                </button>
-                <button type="button"
-                        class="px-4 py-1 rounded-lg bg-green-600 text-white text-sm"
-                        onclick="saveHourEdit(this)">
-                    บันทึก
-                </button>
-            </div>
-        </div>
-    </div>
-    `;
-}
-
+// ฟังก์ชันสร้างการ์ดหัวข้อ (มีโหมดแสดงผล + แก้ไข)
 function createTopicCard(title, hour, period, details) {
     title   = title   || '-';
     hour    = hour    || '-';
@@ -365,6 +287,7 @@ function createTopicCard(title, hour, period, details) {
             </div>
         </div>
 
+        <!-- บล็อกแก้ไข -->
         <div class="hidden edit-block mt-3 border-t pt-3">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                 <input type="text"
@@ -410,83 +333,10 @@ function createTopicCard(title, hour, period, details) {
     `;
 }
 
-function createHomeworkCard(title, isoDate, score, detail) {
-    title  = title  || '-';
-    score  = score  || '-';
-    detail = detail || '';
-
-    const thaiDate = formatThaiDate(isoDate);
-
-    return `
-    <div class="p-4 bg-gray-100 rounded-xl hw-card" data-date="${isoDate}">
-        <div class="flex justify-between">
-            <span class="font-semibold hw-title">${title}</span>
-            <div class="flex gap-3">
-                <button type="button"
-                        class="text-blue-600 hover:text-blue-800 text-sm"
-                        onclick="toggleHWEdit(this)">
-                    แก้ไข
-                </button>
-                <button type="button"
-                        class="text-red-600 hover:text-red-800 text-sm"
-                        onclick="confirmDelete(this)">
-                    ลบ
-                </button>
-            </div>
-        </div>
-
-        <p class="text-sm text-gray-600 mt-1">
-            กำหนดส่ง: <span class="hw-date">${thaiDate}</span>
-        </p>
-        <p class="text-sm text-gray-600">
-            คะแนนเต็ม: <span class="hw-score">${score}</span> คะแนน
-        </p>
-        ${detail ? `<p class="text-sm text-gray-600 mt-1 hw-detail">รายละเอียด: <span class="hw-detail-text">${detail}</span></p>` : ''}
-
-        <div class="hidden edit-block mt-3 border-t pt-3">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <select class="border rounded-lg px-3 py-2 edit-hw-title">
-                    <!-- options จะถูกเติมตอนเปิดแก้ไข -->
-                </select>
-
-                <input type="date" class="border rounded-lg px-3 py-2 edit-hw-date">
-
-                <input type="number" class="border rounded-lg px-3 py-2 edit-hw-score"
-                       placeholder="คะแนนเต็ม">
-            </div>
-
-            <textarea rows="2"
-                      class="border rounded-lg px-3 py-2 w-full mt-2 edit-hw-detail"
-                      placeholder="รายละเอียดการบ้าน"></textarea>
-
-            <div class="flex justify-end gap-2 mt-2">
-                <button type="button"
-                        class="px-3 py-1 rounded-lg bg-gray-200 text-gray-700 text-sm"
-                        onclick="cancelHWEdit(this)">
-                    ยกเลิก
-                </button>
-                <button type="button"
-                        class="px-4 py-1 rounded-lg bg-green-600 text-white text-sm"
-                        onclick="saveHWEdit(this)">
-                    บันทึก
-                </button>
-            </div>
-        </div>
-    </div>
-    `;
-}
-
-// ---------- init (ตัวอย่างเริ่มต้น) ----------
+// เริ่มต้น: ใส่หัวข้อตัวอย่าง + เติม dropdown การบ้าน
 document.addEventListener('DOMContentLoaded', () => {
-    const hourList  = document.getElementById('hourList');
     const topicList = document.getElementById('topicList');
-    const hwList    = document.getElementById('hwList');
 
-    // ชั่วโมงตัวอย่าง
-    hourList.insertAdjacentHTML('beforeend', createHourCard('สอนทฤษฎี', '1'));
-    hourList.insertAdjacentHTML('beforeend', createHourCard('สอนปฏิบัติ', '2'));
-
-    // หัวข้อเนื้อหาตัวอย่าง
     const initialTopics = [
         {
             title: 'บทที่ 1 : การนับเลข 1–20',
@@ -509,24 +359,7 @@ document.addEventListener('DOMContentLoaded', () => {
         );
     });
 
-    // การบ้านตัวอย่าง
-    hwList.insertAdjacentHTML(
-        'beforeend',
-        createHomeworkCard('ใบงานที่ 1 : นับจำนวนรูปภาพ', '2025-01-12', '10', 'ทำแบบฝึกหัดจากใบงานที่ 1')
-    );
-
-    populateHomeworkOptions(true);
-
-    // ✅ dropdown เลือกหลักสูตร
-    const courseSelector = document.getElementById('courseSelector');
-    if (courseSelector) {
-        courseSelector.addEventListener('change', (e) => {
-            const url = e.target.value;
-            if (url) {
-                window.location.href = url;
-            }
-        });
-    }
+    populateHomeworkOptions();
 });
 
 // ----------------------------- //
@@ -535,7 +368,6 @@ document.addEventListener('DOMContentLoaded', () => {
 function confirmDelete(btn){
     if(confirm("ยืนยันการลบข้อมูลนี้?")){
         btn.closest(".p-4").remove();
-        populateHomeworkOptions(true);
     }
 }
 
@@ -558,51 +390,17 @@ function saveTeachHour(){
         return;
     }
 
-    hourList.insertAdjacentHTML("beforeend", createHourCard(name, hour));
+    hourList.insertAdjacentHTML("beforeend", `
+        <div class="p-4 bg-gray-100 rounded-xl flex justify-between">
+            <span>${name} — ${hour} ชั่วโมง/สัปดาห์</span>
+            <button type="button" class="text-red-600 hover:text-red-800"
+                    onclick="confirmDelete(this)">ลบ</button>
+        </div>
+    `);
 
     document.getElementById('newHourName').value = "";
     document.getElementById('newHourValue').value = "";
     document.getElementById('hourInputArea').classList.add("hidden");
-}
-
-function toggleHourEdit(btn){
-    const card      = btn.closest('.hour-card');
-    const editBlock = card.querySelector('.edit-block');
-    const isHidden  = editBlock.classList.contains('hidden');
-
-    if (isHidden) {
-        const categorySpan = card.querySelector('.hour-category');
-        const valueSpan    = card.querySelector('.hour-value');
-
-        editBlock.querySelector('.edit-hour-category').value = categorySpan.textContent.trim();
-        editBlock.querySelector('.edit-hour-value').value    = valueSpan.textContent.trim();
-    }
-
-    editBlock.classList.toggle('hidden');
-}
-
-function cancelHourEdit(btn){
-    const card      = btn.closest('.hour-card');
-    const editBlock = card.querySelector('.edit-block');
-    editBlock.classList.add('hidden');
-}
-
-function saveHourEdit(btn){
-    const card      = btn.closest('.hour-card');
-    const editBlock = card.querySelector('.edit-block');
-
-    const newCategory = editBlock.querySelector('.edit-hour-category').value.trim();
-    const newValue    = editBlock.querySelector('.edit-hour-value').value.trim();
-
-    if (!newCategory || !newValue) {
-        alert('กรุณาเลือกหัวข้อและจำนวนชั่วโมง');
-        return;
-    }
-
-    card.querySelector('.hour-category').textContent = newCategory;
-    card.querySelector('.hour-value').textContent    = newValue;
-
-    editBlock.classList.add('hidden');
 }
 
 
@@ -646,22 +444,31 @@ function saveTopic(){
         createTopicCard(title, hour, period, details || "- เพิ่มรายละเอียดเพิ่มเติมได้ในภายหลัง")
     );
 
+    // เพิ่มหัวข้อใหม่เข้า dropdown ชื่อการบ้านด้วย
+    const hwSelect = document.getElementById('newHW');
+    if (hwSelect && title) {
+        const opt = document.createElement('option');
+        opt.value = title;
+        opt.textContent = title;
+        hwSelect.appendChild(opt);
+    }
+
     titleInput.value  = "";
     hourInput.value   = "";
     periodInput.value = "";
     detailInput.value = "";
 
     document.getElementById('topicInput').classList.add("hidden");
-
-    populateHomeworkOptions(true);
 }
 
+// เปิด/ปิดโหมดแก้ไขหัวข้อ
 function toggleTopicEdit(btn){
     const card      = btn.closest('.topic-card');
     const editBlock = card.querySelector('.edit-block');
     const isHidden  = editBlock.classList.contains('hidden');
 
     if (isHidden) {
+        // ดึงค่าปัจจุบันใส่ฟอร์ม
         const titleSpan  = card.querySelector('.topic-title');
         const hoursSpan  = card.querySelector('.topic-hours');
         const periodSpan = card.querySelector('.topic-period');
@@ -703,6 +510,7 @@ function saveTopicEdit(btn){
 
     editBlock.classList.add('hidden');
 
+    // อัปเดต dropdown การบ้านให้มีหัวข้อที่เปลี่ยนชื่อใหม่ด้วย
     populateHomeworkOptions(true);
 }
 
@@ -711,6 +519,8 @@ function saveTopicEdit(btn){
 // ----------------------------- //
 //            HOMEWORK           //
 // ----------------------------- //
+
+// ดึงหัวข้อเนื้อหาที่มีอยู่แล้วไปใส่ใน dropdown ชื่อการบ้าน
 function populateHomeworkOptions(reset = false) {
     const hwSelect = document.getElementById('newHW');
     const titles = document.querySelectorAll('#topicList .topic-title');
@@ -718,6 +528,7 @@ function populateHomeworkOptions(reset = false) {
     if (!hwSelect) return;
 
     if (reset) {
+        // ล้าง option เดิม แล้วใส่ "เลือกหัวข้อบทเรียน" ใหม่
         hwSelect.innerHTML = '<option value="">เลือกหัวข้อบทเรียน</option>';
     }
 
@@ -727,9 +538,7 @@ function populateHomeworkOptions(reset = false) {
             const opt = document.createElement('option');
             opt.value = t;
             opt.textContent = t;
-            if (![...hwSelect.options].some(o => o.value === t)) {
-                hwSelect.appendChild(opt);
-            }
+            hwSelect.appendChild(opt);
         }
     });
 }
@@ -740,6 +549,7 @@ function toggleHWInput(){
 }
 
 function saveHW(){
+
     const hwSelect  = document.getElementById('newHW');
     const hw        = hwSelect.value.trim();
     const date      = document.getElementById('newHWDate').value;
@@ -752,96 +562,31 @@ function saveHW(){
         return;
     }
 
-    hwList.insertAdjacentHTML(
-        "beforeend",
-        createHomeworkCard(hw, date, score, detail)
-    );
+    // แปลง ค.ศ. → พ.ศ.
+    const d = new Date(date);
+    const thaiYear = d.getFullYear() + 543;
+    const thaiMonths = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน",
+                        "กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+
+    const formatted = `${d.getDate()} ${thaiMonths[d.getMonth()]} ${thaiYear}`;
+
+    hwList.insertAdjacentHTML("beforeend", `
+        <div class="p-4 bg-gray-100 rounded-xl">
+            <div class="flex justify-between">
+                <span class="font-semibold">${hw}</span>
+                <button type="button" class="text-red-600 hover:text-red-800" onclick="confirmDelete(this)">ลบ</button>
+            </div>
+
+            <p class="text-sm text-gray-600 mt-1"> กำหนดส่ง: ${formatted}</p>
+            <p class="text-sm text-gray-600"> คะแนนเต็ม: ${score} คะแนน</p>
+            ${detail ? `<p class="text-sm text-gray-600 mt-1">รายละเอียด: ${detail}</p>` : ""}
+        </div>
+    `);
 
     hwSelect.value = "";
     document.getElementById('newHWDate').value   = "";
     document.getElementById('newHWScore').value  = "";
     document.getElementById('newHWDetail').value = "";
     document.getElementById('hwInput').classList.add("hidden");
-}
-
-function toggleHWEdit(btn){
-    const card      = btn.closest('.hw-card');
-    const editBlock = card.querySelector('.edit-block');
-
-    const currentTitle = card.querySelector('.hw-title').textContent.trim();
-    const currentScore = card.querySelector('.hw-score').textContent.trim();
-    const currentDate  = card.getAttribute('data-date') || '';
-    const detailSpan   = card.querySelector('.hw-detail-text');
-    const currentDetail = detailSpan ? detailSpan.textContent.trim() : '';
-
-    // เติม options หัวข้อจาก topicList
-    const select = editBlock.querySelector('.edit-hw-title');
-    select.innerHTML = '<option value="">เลือกหัวข้อบทเรียน</option>';
-    const titles = document.querySelectorAll('#topicList .topic-title');
-    titles.forEach(el => {
-        const t = el.textContent.trim();
-        if (t) {
-            const opt = document.createElement('option');
-            opt.value = t;
-            opt.textContent = t;
-            select.appendChild(opt);
-        }
-    });
-    if (currentTitle) {
-        if (![...select.options].some(o => o.value === currentTitle)) {
-            const extra = document.createElement('option');
-            extra.value = currentTitle;
-            extra.textContent = currentTitle;
-            select.appendChild(extra);
-        }
-        select.value = currentTitle;
-    }
-
-    editBlock.querySelector('.edit-hw-date').value   = currentDate;
-    editBlock.querySelector('.edit-hw-score').value  = currentScore;
-    editBlock.querySelector('.edit-hw-detail').value = currentDetail;
-
-    editBlock.classList.toggle('hidden');
-}
-
-function cancelHWEdit(btn){
-    const card      = btn.closest('.hw-card');
-    const editBlock = card.querySelector('.edit-block');
-    editBlock.classList.add('hidden');
-}
-
-function saveHWEdit(btn){
-    const card      = btn.closest('.hw-card');
-    const editBlock = card.querySelector('.edit-block');
-
-    const newTitle  = editBlock.querySelector('.edit-hw-title').value.trim();
-    const newDate   = editBlock.querySelector('.edit-hw-date').value;
-    const newScore  = editBlock.querySelector('.edit-hw-score').value.trim();
-    const newDetail = editBlock.querySelector('.edit-hw-detail').value.trim();
-
-    if (!newTitle || !newDate || !newScore) {
-        alert('กรุณาเลือกหัวข้อการบ้าน และกรอกวันที่/คะแนนเต็มให้ครบ');
-        return;
-    }
-
-    card.querySelector('.hw-title').textContent = newTitle;
-    card.setAttribute('data-date', newDate);
-    card.querySelector('.hw-date').textContent  = formatThaiDate(newDate);
-    card.querySelector('.hw-score').textContent = newScore;
-
-    let detailP = card.querySelector('.hw-detail');
-    if (newDetail) {
-        if (!detailP) {
-            detailP = document.createElement('p');
-            detailP.className = 'text-sm text-gray-600 mt-1 hw-detail';
-            detailP.innerHTML = 'รายละเอียด: <span class="hw-detail-text"></span>';
-            card.appendChild(detailP);
-        }
-        detailP.querySelector('.hw-detail-text').textContent = newDetail;
-    } else if (detailP) {
-        detailP.remove();
-    }
-
-    editBlock.classList.add('hidden');
 }
 </script>

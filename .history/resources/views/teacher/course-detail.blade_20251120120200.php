@@ -13,46 +13,6 @@
         <p class="text-gray-600 mt-2">ดูรายละเอียดของหลักสูตรที่ครูกำลังสอน</p>
     </div>
 
-    {{-- =========================  --}}
-    {{--    DROPDOWN เลือกหลักสูตร  --}}
-    {{-- =========================  --}}
-    @php
-        // ถ้า Controller ส่ง $courses มา ก็จะมีตัวเลือกให้เลือกหลักสูตร
-        $courseOptions = collect($courses ?? []);
-    @endphp
-
-    <div class="bg-white rounded-3xl shadow-md p-8 border border-gray-100 mb-2">
-        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-            <div>
-                <h3 class="text-xl font-semibold text-gray-800">เลือกหลักสูตร</h3>
-                <p class="text-gray-500 text-sm mt-1">
-                    เลือกหลักสูตรที่ครูสร้างไว้เพื่อดูรายละเอียดและจัดการข้อมูล
-                </p>
-            </div>
-
-            <div class="w-full md:w-80">
-                @if($courseOptions->isNotEmpty())
-                    <label for="courseSelector" class="block text-sm text-gray-600 mb-1">
-                        เลือกหลักสูตร
-                    </label>
-                    <select id="courseSelector"
-                            class="w-full border border-gray-300 rounded-2xl px-4 py-2
-                                   focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                        @foreach($courseOptions as $courseOption)
-                            <option value="{{ route('course.detail', $courseOption) }}">
-                                {{ $courseOption->name }} ({{ $courseOption->grade ?? '-' }})
-                            </option>
-                        @endforeach
-                    </select>
-                @else
-                    <p class="text-gray-500 text-sm">
-                        ยังไม่มีหลักสูตรที่สร้างไว้ กรุณาไปที่เมนู "สร้างหลักสูตร" ก่อน
-                    </p>
-                @endif
-            </div>
-        </div>
-    </div>
-
     <!-- ========================= -->
     <!--     COURSE INFORMATION    -->
     <!-- ========================= -->
@@ -67,7 +27,6 @@
         </div>
 
         @php
-            // ตัวอย่างข้อมูลหลักสูตร (เดโม่)
             $course = [
                 'name' => 'คณิตศาสตร์พื้นฐาน ป.1',
                 'rooms' => ['ป.1/1','ป.1/2'],
@@ -516,17 +475,6 @@ document.addEventListener('DOMContentLoaded', () => {
     );
 
     populateHomeworkOptions(true);
-
-    // ✅ dropdown เลือกหลักสูตร
-    const courseSelector = document.getElementById('courseSelector');
-    if (courseSelector) {
-        courseSelector.addEventListener('change', (e) => {
-            const url = e.target.value;
-            if (url) {
-                window.location.href = url;
-            }
-        });
-    }
 });
 
 // ----------------------------- //
